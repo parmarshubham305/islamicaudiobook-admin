@@ -23,6 +23,7 @@ storage/database.sqlite
 # Ignore public storage links
 public/storage/
 public/audio/*
+public/e-book/*
 storage/app/public/
 storage/temp/
 storage/debugbar/

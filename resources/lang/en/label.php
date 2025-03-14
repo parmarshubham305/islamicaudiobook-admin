@@ -180,6 +180,7 @@
         'edit_page' => "Edit Page",
         'description' => "Description",
         'audio_content' => "Audio Content",
+        'ebook_content' => "E-Book Content",
         'language' => "Language",
         'add_language' => "Add Language",
         'language_list' => "Language List",
@@ -194,6 +195,7 @@
         'video_list' =>"Video List",
         'video_upload_type' =>"Video Upload Type",
         'audio_book' => "Audio Book",
+        'e_book' => "E-Book",
         'server_video' =>"Server Video",
         'external_url' =>"External URL",
         'youtube_video' =>"Youtube Video",
@@ -323,6 +325,14 @@
         'audio_update' => "Audio Update Succesfully",
         'audio_not_update' => "Audio Not Update",
         'audio_delete' =>"Audio Delete Succesfully",
+
+        // E-Book //
+        'e_book_save' =>"E-Book Added Succesfully",
+        'e_book_not_save' =>"E-Book Not Added",
+        'e_book_update' => "E-Book Update Succesfully",
+        'e_book_not_update' => "E-Book Not Update",
+        'e_book_delete' =>"E-Book Delete Succesfully",
+        'e_book_file_delete' =>"E-Book File Delete Succesfully",
 
         // Video //
         'video_save' =>"Video Added Succesfully",

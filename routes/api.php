@@ -136,3 +136,6 @@ Route::post('get_like_ai_audio', [HomeController::class, 'get_like_ai_audio'])->
 Route::post('add_comment', [RatingController::class, 'add_comment'])->name('add_comment');
 Route::post('view_comment', [RatingController::class, 'view_comment'])->name('view_comment');
 Route::post('add_view', [RatingController::class, 'add_view'])->name('add_view');
+
+// E-Book APIs
+Route::post('e-books-list', [HomeController::class, 'ebookList'])->name('e-books.ebookList'); 

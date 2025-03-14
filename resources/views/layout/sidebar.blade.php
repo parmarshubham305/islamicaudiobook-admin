@@ -97,6 +97,13 @@
             </a>
         </li>
 
+        <li class="{{ (request()->routeIs('e-book*')) ? 'active' : '' }}">
+            <a href="{{ route('e-book.index') }}">
+                <img class="menu-icon" src="{{ asset('assets/imgs/ebook_1.png') }}" alt="E-Book Icon" />
+                <span>E-Book</span>
+            </a>
+        </li>
+
         <li class="side_line {{ (request()->routeIs('comment*')) ? 'active' : '' }}">
             <a href="{{ route('comment.index') }}">
                 <img class="menu-icon" src="{{ asset('assets/imgs/video_comment.png') }}" alt="" />

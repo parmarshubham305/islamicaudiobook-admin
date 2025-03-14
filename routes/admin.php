@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Auth\AdminController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\AiaudioTransactionController;
+use App\Http\Controllers\Admin\EBookController;
 
 
 
@@ -121,6 +122,14 @@ Route::group(['prefix' => 'admin','middleware' => 'adminauth'], function()  {
     // Language //
     Route::delete('delete-audio/{id}', [AiaudiobookController::class, 'delete_audio'])->name('aiaudiobook.deleteaudio');
     Route::resource('language', LanguageController::class)->only(['index']);
+
+    // E-Book
+    Route::resource('e-book', EBookController::class);
+    Route::get('e-book/details/{id}', [EBookController::class,'detail'])->name('eBookDetail');
+    Route::get('e-book/delete/{id}', [EBookController::class, 'deleteEBook'])->name('e-book.deleteEBook');
+    Route::get('e-book/file/delete/{id}', [EBookController::class, 'deleteEBookFile'])->name('e-book.deleteEBookFile');
+    Route::get('e-book/downlaod/{id}', [EBookController::class, 'ebookDownload'])->name('e-book.ebookDownload');
+    // Route::resource('e-book', AiaudiobookController::class)->only(['create', 'store', 'edit', 'update', 'show', 'destroy']);
 
     // Package
     Route::resource('package', PackageController::class)->only(['index']);
