@@ -1,0 +1,1 @@
+<h1>Vefiry Otp is: {{$token}}</h1>

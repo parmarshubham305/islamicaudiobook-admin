@@ -1,0 +1,50 @@
+# Ignore environment and sensitive files
+.env
+.env.*
+
+# Ignore vendor dependencies
+/vendor/
+node_modules/
+
+# Ignore cache and compiled files
+bootstrap/cache/
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+storage/framework/testing/
+
+# Ignore database files
+db/
+database/*.sqlite
+database/*.sqlite3
+storage/database.sqlite
+
+# Ignore public storage links
+public/storage/
+public/audio/*
+storage/app/public/
+storage/temp/
+storage/debugbar/
+
+# Ignore system files and editor settings
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Ignore dependency manager logs
+npm-debug.log
+yarn-error.log
+
+
+# Virtual environment (if used)
+venv/
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+python-server/
