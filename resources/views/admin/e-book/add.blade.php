@@ -50,7 +50,7 @@
                     </ol>
                 </div>
                 <div class="col-sm-2 d-flex align-items-center justify-content-end">
-                    <a href="{{ route('e-book.index') }}" class="btn btn-default mw-120" style="margin-top:-14px">Audio List</a>
+                    <a href="{{ route('e-book.index') }}" class="btn btn-default mw-120" style="margin-top:-14px">E-Books List</a>
                 </div>
             </div>
             
@@ -64,7 +64,7 @@
                             <div class="col-md-4 mb-3">
                                 <div class="form-group">
                                     <label for="name">{{__('label.name')}}</label>
-                                    <input type="text" name="name" class="form-control" placeholder="{{__('label.enter_audio_name')}}">
+                                    <input type="text" name="name" class="form-control" placeholder="{{__('label.enter_e_book_name')}}">
                                 </div>
                             </div>
                             <div class="col-md-4 mb-3">
@@ -567,7 +567,7 @@
 				success:function(resp){
 					$("#dvloader").hide();
                     
-					get_responce_message(resp, 'aiAudioBook', '{{ route("e-book.index") }}');
+					get_responce_message(resp, 'e-book', '{{ route("e-book.index") }}');
 				},
 				error: function(XMLHttpRequest, textStatus, errorThrown) {
 					$("#dvloader").hide();

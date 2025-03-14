@@ -73,7 +73,7 @@
                             <div class="col-md-4 mb-3">
                                 <div class="form-group">
                                     <label for="name">{{__('label.name')}}</label>
-                                    <input type="text" name="name" value="@if($data){{$data->name}}@endif" class="form-control" placeholder="{{__('label.enter_audio_name')}}">
+                                    <input type="text" name="name" value="@if($data){{$data->name}}@endif" class="form-control" placeholder="{{__('label.enter_e_book_name')}}">
                                 </div>
                             </div>
                             <div class="col-md-4 mb-3">
@@ -197,7 +197,7 @@
                                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                                     <li class="nav-item">
                                         <a class="nav-link {{$audioActive}}" id="audio-tab" data-toggle="tab" href="#audio" role="tab" onclick="checkActiveTab(this)" aria-controls="audio"
-                                        aria-selected="true">Upload Audio</a>
+                                        aria-selected="true">Upload E-Book</a>
                                     </li>
                                 </ul>
                                 <div class="tab-content" id="myTabContent">
@@ -210,7 +210,7 @@
                                                         <div id="container" style="position: relative;">
                                                             <div class="form-group audio-container">
                                                                 <div id="audio-tab-div">
-                                                                    <input type="text" name="e-book_name[]" class="audio-text-input" placeholder="Enter audio name">
+                                                                    <input type="text" name="e-book_name[]" class="audio-text-input" placeholder="Enter e-book name">
                                                                     <input type="file" name="e-book[]" id="audio_converted_url" style="position: relative; z-index: 1;">
                                                                     <button type="button" class="remove-audio" style="display: none;">-</button>
                                                                 </div>  
@@ -298,7 +298,7 @@
                 $("#isAudioTab").val(1);
             }else{
                 var initialAudioHtml = `
-                    <input type="text" name="e-book_name[]" class="audio-text-input" placeholder="Enter audio name">
+                    <input type="text" name="e-book_name[]" class="audio-text-input" placeholder="Enter e-book name">
                     <input type="file" name="audio[]" id="audio_converted_url" style="position: relative; z-index: 1;">
                 `;
                 $("#audio-tab-div").html(initialAudioHtml);

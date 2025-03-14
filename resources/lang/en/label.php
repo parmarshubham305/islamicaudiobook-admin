@@ -212,6 +212,7 @@
         'urls' =>"URL",
         'enter_video_name' =>"Enter Video Name",
         'enter_audio_name' =>"Enter Audio Name",
+        'enter_e_book_name' =>"Enter E-Book Name",
         'enter_price' =>"Enter Price",
         'hello' =>"HELLO",
         'select_category' =>"Select Category",
