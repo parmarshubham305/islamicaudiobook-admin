@@ -43,6 +43,7 @@ class HomeController extends Controller
     private $folder7 = "audio";
     private $folder_artist = "artist";
     private $folder_album = "album";
+    private $folder_ebook = "e-books";
     public $user;
     public $video;
 
@@ -4004,32 +4005,32 @@ class HomeController extends Controller
             foreach ($data as $ra) {
 
                 $ra['file_url'] = url('public/storage/e-book/' . $ra['upload_file']);
-                // $data1 = $this->common->get_all_count_for_ebook($ra['id'], $user_id, $ra['user_id']);
-                // $ra = (object) array_merge((array) $ra, $data1);
+                $data1 = $this->common->get_all_count_for_ebook($ra['id'], $user_id, $ra['user_id']);
+                $ra = (object) array_merge((array) $ra, $data1);
 
-                // $ra->is_favorite = "0";
-                // if ($user_id != 0) {
-                //     $ra->is_favorite = $this->common->is_favorite($request['user_id'], $ra->id);
-                // }
+                $ra->is_favorite = "0";
+                if ($user_id != 0) {
+                    $ra->is_favorite = $this->common->is_favorite($request['user_id'], $ra->id);
+                }
 
-                // $ra->category_name = "";
-                // if (isset($ra->category['name'])) {
-                //     $ra->category_name = $ra->category['name'];
-                // }
+                $ra->category_name = "";
+                if (isset($ra->category['name'])) {
+                    $ra->category_name = $ra->category['name'];
+                }
 
-                // $ra->author_name = "";
-                // if (isset($ra->author['name'])) {
-                //     $ra->author_name = $ra->author['name'];
-                // }
+                $ra->author_name = "";
+                if (isset($ra->author['name'])) {
+                    $ra->author_name = $ra->author['name'];
+                }
 
-                // $ra->full_name = "";
-                // $ra->user_name = "";
-                // $ra->profile_img = asset('/assets/imgs/users.png');
-                // if (isset($ra->user)) {
-                //     $ra->full_name = $ra->user['full_name'];
-                //     $ra->user_name = $ra->user['user_name'];
-                //     $ra->profile_img = $this->common->getImagePath($this->folder, $ra->user['image']);
-                // }
+                $ra->full_name = "";
+                $ra->user_name = "";
+                $ra->profile_img = asset('/assets/imgs/users.png');
+                if (isset($ra->user)) {
+                    $ra->full_name = $ra->user['full_name'];
+                    $ra->user_name = $ra->user['user_name'];
+                    $ra->profile_img = $this->common->getImagePath($this->folder, $ra->user['image']);
+                }
                 
                 // $record_purchase = DB::select(
                 //     'select is_purchased from tbl_ebook_transaction where ebook_id = :ebook_id and user_id = :user_id and status = :status and is_purchased = :is_purchased',
@@ -4043,11 +4044,11 @@ class HomeController extends Controller
                 // if (!empty($record_purchase) || $ra->is_paid == 0) {
                 //     $ra->is_purchased = 1;
                 // } else {
-                //     $ra->is_purchased = 0;
+                    $ra->is_purchased = 0;
                 // }
 
                 $dataarray[] = $ra;
-                // unset($ra->category, $ra->user, $ra->author);
+                unset($ra->category, $ra->user, $ra->author);
             }
 
             return $this->common->API_Response(200, 'E-Book list retrieved successfully', $dataarray, $pagination);
@@ -4057,5 +4058,221 @@ class HomeController extends Controller
         }
     }
 
+    // E-Book
+    public function get_like_ebook(Request $request)
+    {
+        try {
+            $rules = [
+                'user_id' => 'required|numeric',
+            ];
+            
+            $messages = [
+                'user_id.required' => 'User ID is required.',
+                'user_id.numeric' => 'User ID must be a number.',
+            ];
+            
+            $validator = Validator::make($request->all(), $rules, $messages);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => $validator->errors()->first(),
+                ]);
+            }            
+
+            $user_id = isset($request['user_id']) ? $request['user_id'] : 0;
+
+            $page_size = 0;
+            $current_page = 0;
+            $more_page = false;
+            $page_limit = env('PAGE_LIMIT');
+            
+            $result = Like::select('video_id')->where('user_id', $user_id)->where('type', 'ebook')->get();
+
+            $videoarray = array();
+            foreach ($result as $row) {
+                $videoarray[] = $row->video_id;
+            }
+            $video_ids = implode(',', array_map('intval', $videoarray));
+
+            $Ids = explode(',', $video_ids);
+
+            $data = EBook::where(function ($query) {
+                // Consider either (is_created_by_admin = 1) or (is_created_by_admin = 0 and is_approved = 1)
+                $query->where('is_created_by_admin', 1)
+                      ->orWhere(function ($subquery) {
+                          $subquery->where('is_created_by_admin', 0)
+                                   ->where('is_approved', 1);
+                      });
+            })->whereIn('id', $Ids)->with('user','artist','category')->orderBy('created_at', 'desc');
+
+            $total_rows = $data->count();
+            $total_page = $page_limit;
+            $page_size = ceil($total_rows / $total_page);
+            $current_page = $request->page_no ?? 1;
+            $offset = $current_page * $total_page - $total_page;
+            $data->take($total_page)->offset($offset);
+
+            $more_page = $this->common->more_page($current_page, $page_size);
+
+            $data = $data->get()->toArray();
+
+            $pagination = $this->common->pagination_array($total_rows, $page_size, $current_page, $more_page);
+
+            $dataarray = [];
+            foreach ($data as $ra) {
+
+                $data1 = $this->common->get_all_count_for_ebook($ra['id'], $user_id, $ra['user_id']);
+
+                $ra = (object) array_merge((array) $ra, $data1);
+
+                $ra->is_like = "0";
+                if ($user_id != 0) {
+                    $ra->is_like = $this->common->is_like($request['user_id'], $ra->id);
+                }
+
+                $ra->image = $this->common->getImagePath($this->folder_ebook, $ra->image);
+
+                $ra->category_name = "";
+                if (isset($ra->category['name'])) {
+                    $ra->category_name = $ra->category['name'];
+                }
+
+                $ra->artist_name = "";
+                if (isset($ra->artist['name'])) {
+                    $ra->artist_name = $ra->artist['name'];
+                }
+
+               
+                $ra->full_name = "";
+                $ra->user_name = "";
+                $ra->profile_img = asset('/assets/imgs/users.png');
+                if (isset($ra->user)) {
+                    $ra->full_name = $ra->user['full_name'];
+                    $ra->user_name = $ra->user['user_name'];
+                    $ra->profile_img = $this->common->getImagePath($this->folder, $ra->user['image']);
+                }
+
+                $dataarray[] = $ra;
+                unset($ra->category, $ra->user, $ra->artist);
+            }
+
+            return $this->common->API_Response(200, __('api_msg.get_record_successfully'), $dataarray, $pagination);
+
+        } catch (Exception $e) {
+            return response()->json(array('status' => 400, 'errors' => $e->getMessage()));
+        }
+    }
+
+    public function get_comment_ebook(Request $request)
+    {
+        try {
+            $rules = [
+                'user_id' => 'required|numeric',
+            ];
+            
+            $messages = [
+                'user_id.required' => 'User ID is required.',
+                'user_id.numeric' => 'User ID must be a number.',
+            ];
+            
+            $validator = Validator::make($request->all(), $rules, $messages);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => $validator->errors()->first(),
+                ]);
+            }            
+
+            $user_id = isset($request['user_id']) ? $request['user_id'] : 0;
+
+            $page_size = 0;
+            $current_page = 0;
+            $more_page = false;
+            $page_limit = env('PAGE_LIMIT');
+
+            $result = Comment::select('video_id')->where('user_id', $user_id)->where('type', 'ebook')->get();
+
+            $videoarray = array();
+            foreach ($result as $row) {
+                $videoarray[] = $row->video_id;
+            }
+            $video_ids = implode(',', array_map('intval', $videoarray));
+
+            $Ids = explode(',', $video_ids);
+
+            $data = EBook::where(function ($query) {
+                // Consider either (is_created_by_admin = 1) or (is_created_by_admin = 0 and is_approved = 1)
+                $query->where('is_created_by_admin', 1)
+                      ->orWhere(function ($subquery) {
+                          $subquery->where('is_created_by_admin', 0)
+                                   ->where('is_approved', 1);
+                      });
+            })->whereIn('id', $Ids)->with('user','category','artist')->orderBy('created_at', 'desc');
+
+            $total_rows = $data->count();
+
+            $total_page = $page_limit;
+            $page_size = ceil($total_rows / $total_page);
+            $current_page = $request->page_no ?? 1;
+            $offset = $current_page * $total_page - $total_page;
+            $data->take($total_page)->offset($offset);
+
+            $more_page = $this->common->more_page($current_page, $page_size);
+
+            $data = $data->get()->toArray();
+
+            $pagination = $this->common->pagination_array($total_rows, $page_size, $current_page, $more_page);
+
+            $dataarray = [];
+            foreach ($data as $ra) {
+
+                $data1 = $this->common->get_all_count_for_ebook($ra['id'], $user_id, $ra['user_id']);
+
+                $ra = (object) array_merge((array) $ra, $data1);
+
+                $ra->is_like = "0";
+                if ($user_id != 0) {
+                    $ra->is_like = $this->common->is_like($request['user_id'], $ra->id);
+                }
+
+                $ra->image = $this->common->getImagePath($this->folder_ebook, $ra->image);
+
+                // if($ra->video_type =="server_video"){
+                //     $ra->url = $this->common->getImagePath($this->folder5, $ra->url);
+
+                // }
+
+                $ra->category_name = "";
+                if (isset($ra->category['name'])) {
+                    $ra->category_name = $ra->category['name'];
+                }
+
+                $ra->artist_name = "";
+                if (isset($ra->artist['name'])) {
+                    $ra->artist_name = $ra->artist['name'];
+                }
+
+
+                $ra->full_name = "";
+                $ra->user_name = "";
+                $ra->profile_img = asset('/assets/imgs/users.png');
+                if (isset($ra->user)) {
+                    $ra->full_name = $ra->user['full_name'];
+                    $ra->user_name = $ra->user['user_name'];
+                    $ra->profile_img = $this->common->getImagePath($this->folder, $ra->user['image']);
+                }
+
+                $dataarray[] = $ra;
+                unset($ra->category, $ra->user, $ra->artist);
+            }
+
+            return $this->common->API_Response(200, __('api_msg.get_record_successfully'), $dataarray, $pagination);
+
+        } catch (Exception $e) {
+            return response()->json(array('status' => 400, 'errors' => $e->getMessage()));
+        }
+    }
 }
 

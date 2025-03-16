@@ -46,4 +46,7 @@ return [
     'add_to_download' =>"Add Download.",
     'remove_successfully' =>"Video Remove Succesully.",
     'record_add' =>"Add Video.",
+    'user_id_is_required' => 'user_id field is required',
+    'video_id_is_required' => 'video_id field is required',
+    'get_record_successfully' => "Records retrived successfully"
 ];  

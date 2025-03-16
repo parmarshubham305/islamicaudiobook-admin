@@ -9,6 +9,7 @@ use App\Models\Notification;
 use App\Models\User;
 use App\Models\Video;
 use App\Models\Audio;
+use App\Models\EBook;
 use App\Models\Like;
 use App\Models\View;
 use App\Models\Follow;
@@ -26,6 +27,7 @@ class RatingController extends Controller
 
     private $folder2 = "user";
     private $folder_video = "video";
+    private $folder_ebook = "e-books";
     private $folder_audio = "audio";
     private $folder_artist = "artist";
 
@@ -86,7 +88,6 @@ class RatingController extends Controller
             $type = $request['type'];
 
             $comment_data =Comment::where('user_id',$user_id)->where('type',$type)->where('video_id',$video_id)->first();
-
             if (isset($comment_data['id'])) {
 
                     $data['user_id'] = $user_id;
@@ -113,10 +114,11 @@ class RatingController extends Controller
                     $Video = Audio::where('id', $video_id)->where('is_aiaudiobook',"0")->first();
                 }else if($type == 'aiaudio'){
                     $Video = Audio::where('id', $video_id)->where('is_aiaudiobook',"1")->first();
-                }else{
+                } else if($type == 'ebook') {
+                    $Video = EBook::where('id', $video_id)->first();
+                } else{
                     $Video = Video::where('id', $video_id)->first();
                 }
-               
 
                 $User = User::where('id', $user_id)->first();
     
@@ -125,6 +127,8 @@ class RatingController extends Controller
                         $title = $User['full_name'] . ' Commented on your Audio.';
                     }else if($type == 'aiaudio'){
                         $title = $User['full_name'] . ' Commented on your AI Audio.';
+                    }else if($type == 'ebook'){
+                        $title = $User['full_name'] . ' Commented on your E-Book.';
                     }else{
                         $title = $User['full_name'] . ' Commented on your Video.';
                     }
@@ -204,27 +208,26 @@ class RatingController extends Controller
     public function view_comment(Request $request)
     {
         try {
-            $validation = Validator::make(
-                $request->all(),
-                [
-                    'video_id' => 'required|numeric',
-                    'type' => 'required',
-                ],
-                [
-                    'video_id.required' => __('api_msg.video_id_is_required'),
-                    'type' => __('type is required'),
-                ]
-            );
-            if ($validation->fails()) {
-
-                $errors = $validation->errors()->first('video_id');
-                $data['status'] = 400;
-                if ($errors) {
-                    $data['message'] = $errors;
-                }
-                return $data;
+            $rules = [
+                'video_id' => 'required|numeric',
+                'type' => 'required|string',
+            ];
+            
+            $messages = [
+                'video_id.required' => __('video_id is required'),
+                'video_id.numeric' => __('video_id must be a number'),
+                'type.required' => __('type is required'),
+            ];
+            
+            $validator = Validator::make($request->all(), $rules, $messages);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => $validator->errors()->first(),
+                ]);
             }
-
+            
             $video_id = $request['video_id'];
             $type = $request['type'];
 
@@ -304,33 +307,28 @@ class RatingController extends Controller
     public function like_dislike(Request $request)
     {
         try {
-            $validation = Validator::make(
-                $request->all(),
-                [
-                    'user_id' => 'required|numeric',
-                    'video_id' => 'required|numeric',
-                    'type' => 'required|string',
-                ],
-                [
-                    'user_id.required' => __('api_msg.user_id_is_required'),
-                    'video_id.required' => __('api_msg.video_id_is_required'),
-                    'type.required' => __('Type is required'),
-                ]
-            );
-            if ($validation->fails()) {
- 
-                $errors = $validation->errors()->first('user_id');
-                $errors1 = $validation->errors()->first('video_id');
-                $data['status'] = 400;
-                if ($errors) {
-                    $data['message'] = $errors;
-                } elseif ($errors1) {
-                    $data['message'] = $errors1;
-                } elseif ($errors2) {
-                    $data['message'] = $errors2;
-                }
-                return $data;
-            }
+            $rules = [
+                'user_id' => 'required|numeric',
+                'video_id' => 'required|numeric',
+                'type' => 'required|string',
+            ];
+            
+            $messages = [
+                'user_id.required' => 'User ID is required.',
+                'user_id.numeric' => 'User ID must be a number.',
+                'video_id.required' => 'Video ID is required.',
+                'video_id.numeric' => 'Video ID must be a number.',
+                'type.required' => 'Type is required.',
+            ];
+            
+            $validator = Validator::make($request->all(), $rules, $messages);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => $validator->errors()->first(),
+                ]);
+            }            
  
             $user_id = $request['user_id'];
             $video_id = $request['video_id'];
@@ -430,8 +428,8 @@ class RatingController extends Controller
                     'type' => 'required',
                 ],
                 [
-                    'user_id.required' => __('api_msg.user_id_required'),
-                    'video_id.required' => __('api_msg.video_id_required'),
+                    'user_id.required' => __('user_id is required'),
+                    'video_id.required' => __('video_id field is required'),
                     'type.required' => __('type is required'),
                 ]
             );
@@ -471,13 +469,12 @@ class RatingController extends Controller
                         $Plus->save();
                     }
 
-                    return $this->common->API_Response(200, __('api_msg.video_view_add') ,array($SaveData));
+                    return $this->common->API_Response(200, __('View added successfully.') ,array($SaveData));
                 } else {
-                    return $this->common->API_Response(400, __('api_msg.data_not_save'));
+                    return $this->common->API_Response(400, __('Data not saved.'));
                 }
-
             } else {
-                return $this->common->API_Response(200, __('api_msg.propertie_view_already'));
+                return $this->common->API_Response(200, __('Property view already exists.'));
             }
 
         }catch (Exception $e) {
@@ -711,6 +708,8 @@ class RatingController extends Controller
                 $Ids = explode(',', $video_ids);
                 if($type == 'video'){
                     $data = Video::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with('category')->orderBy('created_at', 'desc');
+                }if($type == 'ebook'){
+                    $data = EBook::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with('category')->orderBy('created_at', 'desc');
                 }else if($type == 'aiaudio'){
                     $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"1")->with('category')->orderBy('created_at', 'desc');
                 }else{
@@ -733,6 +732,7 @@ class RatingController extends Controller
                 $pagination = $this->common->pagination_array($total_rows, $page_size, $current_page, $more_page);
 
                 $dataarray = [];
+
                 foreach ($data as $ra) {
                     if($type == 'video'){
                         $datas = $this->common->get_all_count_for_video($ra['id'], $user_id);
@@ -741,7 +741,11 @@ class RatingController extends Controller
                         if($ra->video_type =="server_video"){
                             $ra->url = $this->common->getImagePath($this->folder_video, $ra->url);
                         }
-                    }else if($type == 'aiaudio'){
+                    } else if($type == 'ebook'){
+                        $datas = $this->common->get_all_count_for_ebook($ra['id'], $user_id);
+                        $ra = (object) array_merge((array) $ra, $datas);
+                        $ra->image = $this->common->getImagePath($this->folder_ebook, $ra->image);
+                    } else if($type == 'aiaudio'){
                         $datas = $this->common->get_all_count_for_ai_audio($ra['id'], $user_id);
                         $ra = (object) array_merge((array) $ra, $datas);
                         $ra->image = $this->common->getImagePath($this->folder_audio, $ra->image);
@@ -807,9 +811,11 @@ class RatingController extends Controller
                 }
 
                 if($type == 'video'){
-                    return $this->common->API_Response(200, __('api_msg.video_record_get'), $dataarray, $pagination);
+                    return $this->common->API_Response(200, __('Video Record favorite list Get successully'), $dataarray, $pagination);
                 }else if($type == 'aiaudio'){
                     return $this->common->API_Response(200, __('AI Audio favorite list Record Get successully.'), $dataarray, $pagination);
+                }else if($type == 'ebook'){
+                    return $this->common->API_Response(200, __('E-Book favorite list Record Get successully.'), $dataarray, $pagination);
                 }else{
                     return $this->common->API_Response(200, __('Audio Record favorite list Get successully.'), $dataarray, $pagination);
                 }

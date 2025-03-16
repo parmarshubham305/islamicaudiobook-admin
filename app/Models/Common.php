@@ -359,6 +359,46 @@ class Common extends Model
 
        return $data;
     }
+
+    public function get_all_count_for_ebook($id, $user_id = 0, $to_user = 0) {
+        $data = [];
+        $total_comment = Comment::where('video_id', $id)->where('type', 'ebook')->count();
+        $total_like = Like::where('video_id', $id)->where('status', 1)->where('type', 'ebook')->count();
+        $total_dislike = Like::where('video_id', $id)->where('status', 2)->where('type', 'ebook')->count();
+
+        $avg_rating = Comment::where('video_id', $id)->where('type', 'ebook')->avg('rating');
+        $data['avg_rating'] = number_format($avg_rating, 2);
+
+        // $data['is_follow'] = "0";
+        // if ($user_id > 0 && $to_user > 0) {
+        //     $is_favorite = Follow::where('user_id', $user_id)->where('to_user_id', $to_user)->first();
+        //     if ($is_favorite) {
+        //         $data['is_follow'] = "1";
+        //     }
+        // }
+
+        $data['is_favorite'] = "0";
+        if ($user_id) {
+            $is_favorite = Bookmark::where('video_id', $id)->where('user_id', $user_id)->where('type', 'ebook')->first();
+            if ($is_favorite) {
+                $data['is_favorite'] = "1";
+            }
+        }
+   
+        $data['is_download'] = "0";
+        if ($user_id) {
+            $is_favorite = Download::where('video_id', $id)->where('user_id', $user_id)->where('type', 'ebook')->first();
+            if ($is_favorite) {
+                $data['is_download'] = "1";
+            }
+        }
+     
+        $data['total_comment'] = strval($total_comment);
+        $data['total_like'] = strval($total_like);
+        $data['total_dislike'] = strval($total_dislike);
+
+       return $data;
+    }
     
     public function is_like($user_id, $video_id)
     {

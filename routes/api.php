@@ -139,3 +139,5 @@ Route::post('add_view', [RatingController::class, 'add_view'])->name('add_view')
 
 // E-Book APIs
 Route::post('e-books-list', [HomeController::class, 'ebookList'])->name('e-books.ebookList'); 
+Route::post('get_like_ebook', [HomeController::class, 'get_like_ebook'])->name('get_like_ebook');
+Route::post('get_comment_ebook', [HomeController::class, 'get_comment_ebook'])->name('get_comment_ebook');
