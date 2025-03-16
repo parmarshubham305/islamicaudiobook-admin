@@ -3985,7 +3985,7 @@ class HomeController extends Controller
             $cacheKey = "user_liked_ebooks_{$user_id}_page_{$current_page}";
     
             // Check if cached data exists
-            return Cache::remember($cacheKey, now()->addMinutes(60), function () use ($request, $user_id, $current_page) {
+            // return Cache::remember($cacheKey, now()->addMinutes(60), function () use ($request, $user_id, $current_page) {
                 $page_size = 0;
                 $more_page = false;
                 $page_limit = env('PAGE_LIMIT');
@@ -4020,7 +4020,7 @@ class HomeController extends Controller
                 }
     
                 return $this->common->API_Response(200, 'E-Book list retrieved successfully', $dataarray, $pagination);
-            });
+            // });
     
         } catch (Exception $e) {
             return response()->json(['status' => 400, 'errors' => $e->getMessage()]);
