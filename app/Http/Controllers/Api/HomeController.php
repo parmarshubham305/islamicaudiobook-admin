@@ -655,7 +655,7 @@ class HomeController extends Controller
                     $ra->is_like = $this->common->is_like($request['user_id'], $ra->id);
                 }
 
-                    $ra->is_buy = $this->common->check_is_buy($request['user_id']);
+                $ra->subscriptions = $this->common->getUserAllPlansWithBuyStatus($request['user_id']);
 
                 // $ra->is_follw = "0";
                 // if ($user_id != 0) {
@@ -2973,9 +2973,8 @@ class HomeController extends Controller
                     $ra->is_like = $this->common->is_like($request['user_id'], $ra->id);
                 }
 
-                $ra->is_buy = $this->common->check_is_buy($request['user_id']);
+                $ra->subscriptions = $this->common->getUserAllPlansWithBuyStatus($request['user_id']);
 
-                
                 $ra->image = $this->common->getImagePath($this->folder7, $ra->image);
 
                 $ra->category_name = "";
@@ -2988,7 +2987,6 @@ class HomeController extends Controller
                     $ra->artist_name = $ra->artist['name'];
                     $ra->artist_image = $this->common->getImagePath($this->folder_artist, $ra->artist['image']);
                 }
-
 
                 $ra->full_name = "";
                 $ra->user_name = "";
@@ -3045,7 +3043,7 @@ class HomeController extends Controller
                     $ra->is_like = $this->common->is_like($request['user_id'], $ra->id);
                 }
 
-                $ra->is_buy = $this->common->check_is_buy($request['user_id']);
+                $ra->subscriptions = $this->common->getUserAllPlansWithBuyStatus($request['user_id']);
 
                 // $ra->is_follw = "0";
                 // if ($user_id != 0) {
@@ -4001,13 +3999,12 @@ class HomeController extends Controller
                 $data = $data->get()->toArray();
                 $pagination = $this->common->pagination_array($total_rows, $page_size, $current_page, $more_page);
     
-                $dataarray = [];
+                $dataarray = [];                
                 foreach ($data as $ra) {
                     $ra['file_url'] = url('public/storage/e-book/' . $ra['upload_file']);
                     $data1 = $this->common->get_all_count_for_ebook($ra['id'], $user_id, $ra['user_id']);
                     $ra = (object) array_merge((array) $ra, $data1);
-    
-                    $ra->is_favorite = $user_id != 0 ? $this->common->is_favorite($request['user_id'], $ra->id) : "0";
+
                     $ra->category_name = $ra->category['name'] ?? "";
                     $ra->author_name = $ra->author['name'] ?? "";
                     $ra->full_name = $ra->user['full_name'] ?? "";

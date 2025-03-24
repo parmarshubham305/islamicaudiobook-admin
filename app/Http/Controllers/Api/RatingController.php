@@ -469,6 +469,8 @@ class RatingController extends Controller
                         $Plus->save();
                     }
 
+                    $data->touch();
+
                     return $this->common->API_Response(200, __('View added successfully.') ,array($SaveData));
                 } else {
                     return $this->common->API_Response(400, __('Data not saved.'));

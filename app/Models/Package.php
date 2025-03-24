@@ -12,7 +12,7 @@ class Package extends Model
     protected $table = 'tbl_package';
     protected $guarded = array();
 
-    protected $fillable = ['name','price','currency_type', 'android_product_package','ios_product_package','type','time','status','image'];
+    protected $fillable = ['name','price','currency_type', 'android_product_package','ios_product_package','type','time','status','image', 'identifier'];
 
     protected $casts = [
         'price' => 'integer',

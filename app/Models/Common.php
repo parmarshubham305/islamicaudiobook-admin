@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\Subscribe;
 
+use App\Models\Package;
 use Storage;
 use Validator;
-
+use Carbon\Carbon;
 
 class Common extends Model
 {
@@ -262,7 +263,7 @@ class Common extends Model
         }
     }
 
-    public function check_is_buy($user_id =0,$package_id = 2)
+    public function check_is_buy($user_id =0,$package_id)
     {
         $expiry = Transaction::where('status', 1)->get();
         for ($i = 0; $i < count($expiry); $i++) {
@@ -278,6 +279,63 @@ class Common extends Model
         } else {
             return 0;
         }
+    }
+
+    public function getUserAllPlansWithBuyStatus($userId) {
+        $packages = Package::get();
+        $subscriptionsData = [];
+    
+        foreach ($packages as $package) {
+            $packageData = $package->toArray();
+            $packageData['is_buy'] = $this->check_is_buy($userId, $package->id);
+            
+
+            $packageLimit = config("subscription-packages.{$package->identifier}.package_limits", []);
+            $packageData['package_limit'] = $packageLimit;
+            $packageData['limit_statistics'] = [];
+
+            // Page Limits Statistics
+            if ($package->identifier == 'e-book-subscription') {
+                $maxViews = $packageLimit['max_view']['value']; // Max allowed views (e.g., 30)
+                $duration = $packageLimit['max_view']['duration']; // Duration in months
+            
+                $createdAt = Carbon::parse($package->created_at);
+                $now = Carbon::now();
+            
+                // Find the number of months since creation
+                $monthsSinceCreation = $createdAt->diffInMonths($now);
+            
+                // Get the start of the current cycle
+                $startDate = $createdAt->copy()->addMonths($monthsSinceCreation);
+            
+                // End date is one month after the start date
+                $endDate = $startDate->copy()->addMonth();
+            
+                $userPaidEbookViews = View::join('tbl_ebooks', 'tbl_view.video_id', '=', 'tbl_ebooks.id')
+                    ->where('tbl_view.user_id', $userId)
+                    ->where('tbl_view.type', 'ebook')
+                    ->where('tbl_ebooks.is_paid', '1')
+                    ->select(
+                        'tbl_view.*', // Select all fields from tbl_view
+                        'tbl_ebooks.is_paid'
+                    )
+                    ->whereBetween('tbl_view.updated_at', [$startDate, $endDate]) // Apply filter after selecting
+                    ->count();
+            
+                $packageData['limit_statistics'] = [
+                    'ebook_views_count' => $userPaidEbookViews,
+                    'max_view_limit' => $maxViews,
+                    'max_view_limit_reached' => ($userPaidEbookViews >= $maxViews),
+                    'current_cycle_start' => $startDate->toDateTimeString(),
+                    'current_cycle_end' => $endDate->toDateTimeString()
+                ];
+            }            
+            
+
+            $subscriptionsData[] = $packageData; 
+        }
+    
+        return $subscriptionsData;
     }
 
     public function pagination_array($total_rows, $page_size, $current_page, $more_page)

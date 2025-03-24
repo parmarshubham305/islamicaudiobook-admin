@@ -424,7 +424,8 @@ class UserController extends Controller
 
                 $path = $this->common->getImagePath($this->folder, $user_data['image']);
                 $user_data['image'] = $path;
-                $user_data['is_buy'] = $this->common->check_is_buy($user_id);
+
+                $user_data['subscriptions'] = $this->common->getUserAllPlansWithBuyStatus($user_id);
 
                 return $this->common->API_Response(200, __('api_msg.user_record_get'), array($user_data));
             } else{
