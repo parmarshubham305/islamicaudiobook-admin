@@ -4005,7 +4005,7 @@ class HomeController extends Controller
                     $data1 = $this->common->get_all_count_for_ebook($ra['id'], $user_id, $ra['user_id']);
                     $ra = (object) array_merge((array) $ra, $data1);
 
-                    $ra->image = $this->common->getImagePath($this->folder, $ra->image);
+                    $ra->image = $this->common->getImagePath($folder_ebook, $ra->image);
                     $ra->category_name = $ra->category['name'] ?? "";
                     $ra->author_name = $ra->author['name'] ?? "";
                     $ra->full_name = $ra->user['full_name'] ?? "";
