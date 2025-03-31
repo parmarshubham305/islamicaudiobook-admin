@@ -20,4 +20,10 @@ class MultipleEbook extends Model
     public function ebook() {
         return $this->belongsTo(Ebook::class, 'ebook_id');
     }
+
+    // Accessor for upload_file to get public URL
+    public function getUploadFileUrlAttribute()
+    {
+        return asset('e-book/' . $this->upload_file);
+    }
 }

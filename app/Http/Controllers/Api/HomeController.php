@@ -3988,7 +3988,7 @@ class HomeController extends Controller
                 $more_page = false;
                 $page_limit = env('PAGE_LIMIT');
     
-                $data = EBook::with('category', 'artist', 'user')->latest();
+                $data = EBook::with('category', 'artist', 'user', 'multipleEbooks')->latest();
                 $total_rows = $data->count();
                 $total_page = $page_limit;
                 $page_size = ceil($total_rows / $total_page);
