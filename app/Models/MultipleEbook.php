@@ -11,6 +11,8 @@ class MultipleEbook extends Model
 
     protected $table = 'tbl_multiple_e_books';
 
+    protected $appends = ['upload_file_full_path'];
+
     protected $fillable = [
         'ebook_id',
         'upload_file',
