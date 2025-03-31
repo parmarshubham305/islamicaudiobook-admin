@@ -26,6 +26,6 @@ class MultipleEbook extends Model
     // Accessor for upload_file to get public URL
     public function getUploadFileFullPathAttribute()
     {
-        return public_path('e-book/' . $this->upload_file);
+        return asset('e-book/' . $this->upload_file);
     }
 }
