@@ -420,6 +420,9 @@ class Common extends Model
 
     public function get_all_count_for_ebook($id, $user_id = 0, $to_user = 0) {
         $data = [];
+
+        $data['multiple_ebooks'] = MultipleEbook::where('ebook_id', $id)->get();
+
         $total_comment = Comment::where('video_id', $id)->where('type', 'ebook')->count();
         $total_like = Like::where('video_id', $id)->where('status', 1)->where('type', 'ebook')->count();
         $total_dislike = Like::where('video_id', $id)->where('status', 2)->where('type', 'ebook')->count();

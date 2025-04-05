@@ -4064,7 +4064,7 @@ class HomeController extends Controller
 
             $Ids = explode(',', $video_ids);
 
-            $data = EBook::where(function ($query) {
+            $data = EBook::with('category', 'artist', 'user', 'multipleEbooks')->where(function ($query) {
                 // Consider either (is_created_by_admin = 1) or (is_created_by_admin = 0 and is_approved = 1)
                 $query->where('is_created_by_admin', 1)
                       ->orWhere(function ($subquery) {
