@@ -142,3 +142,5 @@ Route::post('e-books-list', [HomeController::class, 'ebookList'])->name('e-books
 Route::post('get_like_ebook', [HomeController::class, 'get_like_ebook'])->name('get_like_ebook');
 Route::post('get_comment_ebook', [HomeController::class, 'get_comment_ebook'])->name('get_comment_ebook');
 Route::post('ebook_by_category', [HomeController::class, 'ebook_by_category'])->name('ebook_by_category');
+Route::post('get_ebook_timestamp', [HomeController::class, 'get_ebook_timestamp'])->name('get_ebook_timestamp');
+Route::post('ebook_view_timestamp', [HomeController::class, 'ebook_view_timestamp'])->name('ebook_view_timestamp');

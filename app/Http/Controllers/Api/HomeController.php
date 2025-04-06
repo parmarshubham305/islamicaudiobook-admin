@@ -22,6 +22,7 @@ use App\Models\Audio_Transaction;
 use App\Models\Payment_Option;
 use App\Models\Timestemp;
 use App\Models\EBook;
+use App\Models\EbookTimestamp;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -4337,6 +4338,148 @@ class HomeController extends Controller
             return $this->common->API_Response(200, __('Success'), $dataarray, $pagination);
         } catch (Exception $e) {
             return response()->json(array('status' => 400, 'errors' => $e->getMessage()));
+        }
+    }
+
+    public function get_ebook_timestamp(Request $request)
+    {
+        try {
+            $validation = Validator::make(
+                $request->all(),
+                [
+                    'user_id' => 'required|numeric',
+                    'ebook_id' => 'required|numeric',
+                    'timestamp' => 'required',
+                ],
+                [
+                    'user_id.required' => 'User ID is required.',
+                    'ebook_id.required' => 'Ebook ID is required.',
+                    'timestamp.required' => 'Timestamp is required.',
+                ]
+            );
+
+            if ($validation->fails()) {
+                $errors = $validation->errors()->first('user_id') 
+                        ?? $validation->errors()->first('ebook_id') 
+                        ?? $validation->errors()->first('timestamp');
+
+                return [
+                    'status' => 400,
+                    'message' => $errors,
+                ];
+            }
+
+            $user_id = $request->user_id;
+            $ebook_id = $request->ebook_id;
+            $timestamp = $request->timestamp;
+
+            $data = EbookTimestamp::where('ebook_id', $ebook_id)
+                        ->where('user_id', $user_id)
+                        ->first();
+
+            if ($data) {
+                $updated = $data->update(['timestamp' => $timestamp]);
+                if ($updated) {
+                    return $this->common->API_Response(200, 'Timestamp updated successfully.');
+                }
+                return $this->common->API_Response(400, 'Failed to save data.');
+            } else {
+                $insert = new EbookTimestamp();
+                $insert->user_id = $user_id;
+                $insert->ebook_id = $ebook_id;
+                $insert->timestamp = $timestamp;
+
+                if ($insert->save()) {
+                    return $this->common->API_Response(200, 'Timestamp stored successfully.');
+                }
+                return $this->common->API_Response(400, 'Failed to save data.');
+            }
+
+        } catch (Exception $e) {
+            return response()->json(['status' => 400, 'errors' => $e->getMessage()]);
+        }
+    }
+
+    public function ebook_view_timestamp(Request $request)
+    {
+        try {
+            $validation = Validator::make(
+                $request->all(),
+                [
+                    'user_id' => 'required|numeric',
+                ],
+                [
+                    'user_id.required' => 'User ID is required.',
+                ]
+            );
+
+            if ($validation->fails()) {
+                return [
+                    'status' => 400,
+                    'message' => $validation->errors()->first('user_id'),
+                ];
+            }
+
+            $user_id = $request->user_id;
+
+            $data = Ebook::with('category', 'artist', 'user', 'multipleEbooks') // Add relationships as needed
+                ->orderBy('created_at', 'desc')
+                ->leftJoin('ebook_timestamps', function ($join) use ($user_id) {
+                    $join->on('tbl_ebooks.id', '=', 'ebook_timestamps.ebook_id')
+                        ->where('ebook_timestamps.user_id', $user_id);
+                })
+                ->select('tbl_ebooks.*', 'ebook_timestamps.timestamp as timestamp')
+                ->get();
+
+            if ($data) {
+
+                $dataarray = [];
+                foreach ($data as $ra) {
+
+                    
+
+                    // $ra = (object) array_merge((array) $ra, $data1);
+
+                    // return response()->json($ra);
+
+                    $ra->is_like = "0";
+                    if ($user_id != 0) {
+                        $ra->is_like = $this->common->is_like($user_id, $ra->id);
+                    }
+
+                    $ra->image = $this->common->getImagePath($this->folder_ebook, $ra->image);
+
+                    $ra->category_name = "";
+                    if (isset($ra->category['name'])) {
+                        $ra->category_name = $ra->category['name'];
+                    }
+
+                    $ra->artist_name = "";
+                    if (isset($ra->artist['name'])) {
+                        $ra->artist_name = $ra->artist['name'];
+                    }
+
+                
+                    $ra->full_name = "";
+                    $ra->user_name = "";
+                    $ra->profile_img = asset('/assets/imgs/users.png');
+                    if (isset($ra->user)) {
+                        $ra->full_name = $ra->user['full_name'];
+                        $ra->user_name = $ra->user['user_name'];
+                        $ra->profile_img = $this->common->getImagePath($this->folder, $ra->user['image']);
+                    }
+
+                    $data1 = $this->common->get_all_count_for_ebook($ra['id'], $user_id, $ra['user_id']);
+                    $dataarray[] = $ra;
+                    unset($ra->category, $ra->user, $ra->artist);
+                }
+                
+                return $this->common->API_Response(200, 'Record fetched successfully.', $dataarray);
+            }
+
+            return $this->common->API_Response(400, 'Failed to fetch data.');
+        } catch (Exception $e) {
+            return response()->json(['status' => 400, 'errors' => $e->getMessage()]);
         }
     }
 }
