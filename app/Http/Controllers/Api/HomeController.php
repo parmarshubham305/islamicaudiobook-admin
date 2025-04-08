@@ -4482,5 +4482,62 @@ class HomeController extends Controller
             return response()->json(['status' => 400, 'errors' => $e->getMessage()]);
         }
     }
+
+    public function ebook_by_id(Request $request)
+    {
+        try {
+            $validation = Validator::make(
+                $request->all(),
+                [
+                    'ebook_id' => 'required|numeric',
+                ],
+                [
+                    'ebook_id.required' => __('api_msg.please_enter_required_fields'),
+                ]
+            );
+
+            if ($validation->fails()) {
+                $errors = $validation->errors()->first('ebook_id');
+                return [
+                    'status' => 400,
+                    'message' => $errors,
+                ];
+            }
+
+            $ebook_id = $request->ebook_id;
+            $user_id = $request->user_id ?? 0;
+
+            $ebook = EBook::with('category', 'artist', 'user', 'multipleEbooks')
+                ->where('id', $ebook_id)
+                ->first();
+
+            if (!$ebook) {
+                return $this->common->API_Response(400, __('api_msg.data_not_found'));
+            }
+
+            $ra = $ebook->toArray();
+            $ra['file_url'] = url('public/storage/e-book/' . $ra['upload_file']);
+
+            $data1 = $this->common->get_all_count_for_ebook($ra['id'], $user_id, $ra['user_id']);
+            $ra = (object) array_merge($ra, $data1);
+
+            $ra->image = $this->common->getImagePath($this->folder_ebook, $ra->image);
+            $ra->category_name = $ra->category['name'] ?? "";
+            $ra->author_name = $ra->artist['name'] ?? "";
+            $ra->full_name = $ra->user['full_name'] ?? "";
+            $ra->user_name = $ra->user['user_name'] ?? "";
+            $ra->profile_img = isset($ra->user)
+                ? $this->common->getImagePath($this->folder, $ra->user['image'])
+                : asset('/assets/imgs/users.png');
+
+            $ra->is_purchased = 0; // default value (modify if logic available)
+
+            // unset($ra->category, $ra->user, $ra->artist);
+
+            return $this->common->API_Response(200, __('Success'), $ra);
+        } catch (Exception $e) {
+            return response()->json(['status' => 400, 'errors' => $e->getMessage()]);
+        }
+    }
 }
 
