@@ -31,7 +31,7 @@ class SmartCollection extends Model
     public function getImageUrlAttribute()
     {
         return $this->image
-            ? url('public/storage/smart-collection/' . $this->image)
+            ? url('storage/smart-collection/' . $this->image)
             : asset('assets/imgs/default-image.png');
     }
 
