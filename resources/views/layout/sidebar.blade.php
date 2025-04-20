@@ -127,7 +127,7 @@
                 <li class="{{ (request()->routeIs('custom-package*')) ? 'active' : '' }}">
                     <a href="{{ route('custom-package.index') }}" class="dropdown-item">
                         <img class="submenu-icon" src="{{ asset('assets/imgs/box.png') }}" alt="" />
-                        <span> {{__('label.package')}} </span>
+                        <span> {{__('label.custom_package')}} </span>
                     </a>
                 </li>
                 <li class="{{ (request()->routeIs('custom-transaction*')) ? 'active' : '' }}">
