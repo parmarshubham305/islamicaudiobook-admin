@@ -138,10 +138,25 @@ Route::post('view_comment', [RatingController::class, 'view_comment'])->name('vi
 Route::post('add_view', [RatingController::class, 'add_view'])->name('add_view');
 
 // E-Book APIs
-Route::post('e-books-list', [HomeController::class, 'ebookList'])->name('e-books.ebookList'); 
+Route::post('e-books-list', [HomeController::class, 'ebookList'])->name('e-books.ebookList');
 Route::post('get_like_ebook', [HomeController::class, 'get_like_ebook'])->name('get_like_ebook');
 Route::post('get_comment_ebook', [HomeController::class, 'get_comment_ebook'])->name('get_comment_ebook');
 Route::post('ebook_by_category', [HomeController::class, 'ebook_by_category'])->name('ebook_by_category');
 Route::post('get_ebook_timestamp', [HomeController::class, 'get_ebook_timestamp'])->name('get_ebook_timestamp');
 Route::post('ebook_view_timestamp', [HomeController::class, 'ebook_view_timestamp'])->name('ebook_view_timestamp');
 Route::post('ebook_by_id', [HomeController::class, 'ebook_by_id'])->name('ebook_by_id');
+
+# ---------------- Customisable Package --------------
+// Smart Collection
+Route::post('smart_collections_list', [HomeController::class, 'smartCollectionsList'])->name('smart_collections_list');
+Route::post('smart_collection_by_id', [HomeController::class, 'smartCollectionById'])->name('smart_collection_by_id');
+// Route::post('custom_package/create', [HomeController::class, 'createCustomPackage'])->name('custom_package_create');
+Route::post('user_custom_packages_all_data', [HomeController::class, 'userCustomPackagesAllData'])->name('user_custom_packages_all_data');
+Route::post('user_smart_collections', [HomeController::class, 'userSmartCollections'])->name('user_smart_collections');
+
+
+// Route to create the custom package before payment
+Route::post('custom_package/create', [HomeController::class, 'createCustomPackagePriorPayment'])->name('custom_package_create');
+
+// Route to confirm payment and activate the custom package
+Route::post('custom_package/confirm_payment', [HomeController::class, 'confirmPackagePayment'])->name('custom_package_confirm_payment');

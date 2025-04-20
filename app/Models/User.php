@@ -25,4 +25,16 @@ class User extends Authenticatable
         'type' => 'integer',
         'status' => 'integer',
     ];
+
+    public function customPackages()
+    {
+        return $this->hasManyThrough(
+            CustomPackage::class,         // Final model
+            CustomTransaction::class,     // Intermediate model
+            'user_id',                    // Foreign key on CustomTransaction table
+            'id',                         // Foreign key on CustomPackage table
+            'id',                         // Local key on User table
+            'custom_package_id'           // Local key on CustomTransaction table
+        );
+    }
 }

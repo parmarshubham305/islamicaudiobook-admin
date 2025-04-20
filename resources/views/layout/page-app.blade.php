@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css">
     <link rel="stylesheet" href="{{asset('/assets/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{asset('/assets/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-    <link href="{{url('/assets/css/toastr.min.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{asset('/assets/css/toastr.min.css')}}" rel="stylesheet" type="text/css">
     <link href="{{ asset('/assets/css/style.css?v=version()') }}" rel="stylesheet">
     <link href="{{asset('/assets/css/custom.css?v=version()') }}" rel="stylesheet">
     <!-- Select2 -->
@@ -122,6 +122,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <!-- Summer notes --> 
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
     <!-- Chunk JS -->
     <!-- 1 file -->

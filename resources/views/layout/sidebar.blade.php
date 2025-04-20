@@ -118,6 +118,33 @@
             </a>
         </li>
 
+        <li class="dropdown {{ (request()->routeIs('custom-package*')) ? 'active' : '' }} {{ (request()->routeIs('custom-transaction*')) ? 'active' : '' }} {{ (request()->routeIs('payment*')) ? 'active' : '' }}">
+            <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <img class="menu-icon" src="{{ asset('assets/imgs/subcription.png') }}" alt="" />
+                <span> {{__('label.custom_subscription')}} </span>
+            </a>
+            <ul class="dropdown-menu side-submenu {{ (request()->routeIs('custom-package*')) ? 'show' : '' }}{{ (request()->routeIs('custom-transaction*')) ? 'show' : '' }} {{ request()->is('admin/payment*') ? 'show' : '' }}">
+                <li class="{{ (request()->routeIs('custom-package*')) ? 'active' : '' }}">
+                    <a href="{{ route('custom-package.index') }}" class="dropdown-item">
+                        <img class="submenu-icon" src="{{ asset('assets/imgs/box.png') }}" alt="" />
+                        <span> {{__('label.package')}} </span>
+                    </a>
+                </li>
+                <li class="{{ (request()->routeIs('custom-transaction*')) ? 'active' : '' }}">
+                    <a href="{{ route('custom-transaction.index') }}" class="dropdown-item">
+                        <img class="submenu-icon" src="{{ asset('assets/imgs/transaction_list.png') }}" alt="" />
+                        <span> {{__('label.transactions')}} </span>
+                    </a>
+                </li>
+                <li class="{{ (request()->routeIs('smart-collection*')) ? 'active' : '' }}">
+                    <a href="{{ route('smart-collection.index') }}" class="dropdown-item">
+                        <img class="submenu-icon" src="{{ asset('assets/imgs/finance.png') }}" alt="" />
+                        <span> {{__('label.smart_collection')}} </span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        
         <li class="dropdown {{ (request()->routeIs('package*')) ? 'active' : '' }} {{ (request()->routeIs('transaction*')) ? 'active' : '' }} {{ (request()->routeIs('payment*')) ? 'active' : '' }}">
             <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <img class="menu-icon" src="{{ asset('assets/imgs/subcription.png') }}" alt="" />

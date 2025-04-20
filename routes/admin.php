@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\PackageController;
+use App\Http\Controllers\Admin\CustomPackageController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\LanguageController;
@@ -17,6 +18,8 @@ use App\Http\Controllers\Admin\AiaudiobookController;
 use App\Http\Controllers\Admin\ArtistController;
 use App\Http\Controllers\Admin\AlbumController;
 use App\Http\Controllers\Admin\TransactionController;
+use App\Http\Controllers\Admin\CustomTransactionController;
+use App\Http\Controllers\Admin\SmartCollectionController;
 use App\Http\Controllers\Auth\AdminController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\AiaudioTransactionController;
@@ -161,5 +164,18 @@ Route::group(['prefix' => 'admin','middleware' => 'adminauth'], function()  {
     // Payment
     Route::resource('payment', PaymentController::class)->only(['index']);
 
+    // Custom Subscription
+    Route::resource('custom-package', CustomPackageController::class)->only(['index']);
+    Route::resource('custom-package', CustomPackageController::class)->only(['create', 'store', 'edit', 'update', 'show', 'destroy']);
+    Route::resource('smart-collection', SmartCollectionController::class);
+    Route::get('smart-collection/delete/{id}', [EBookController::class, 'deleteSmartCollection'])->name('smart-collection.deleteSmartCollection');
+    Route::resource('custom-transaction', CustomTransactionController::class);
+    Route::post('smart-collection/e-books/get-all', [SmartCollectionController::class, 'getAllEbooks'])->name('smart-collection.ebooks.get-all');
+    Route::post('smart-collection/audio-books/get-all', [SmartCollectionController::class, 'getAllAudioBooks'])->name('smart-collection.audiobooks.get-all');
+    Route::post('smart-collection/artists/get-all', [SmartCollectionController::class, 'getArtists'])->name('smart-collection.artists.get-all');
+    Route::post('smart-collection/categories/get-all', [SmartCollectionController::class, 'getCategories'])->name('smart-collection.categories.get-all');
+    Route::post('smart-collection/create', [SmartCollectionController::class, 'createSmartCollection'])->name('smart-collection.create');
+    Route::post('smart-collection/update-data', [SmartCollectionController::class, 'updateSmartCollection'])->name('smart-collection.update-data');
+    Route::post('smart-collection/get/{id}', [SmartCollectionController::class, 'getSmartCollectionDataById'])->name('smart-collection.get');
 });
 

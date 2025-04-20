@@ -23,6 +23,11 @@ use App\Models\Payment_Option;
 use App\Models\Timestemp;
 use App\Models\EBook;
 use App\Models\EbookTimestamp;
+use App\Models\SmartCollection;
+use App\Models\SmartCollectionItem;
+use App\Models\CustomPackage;
+use App\Models\CustomPackageSmartCollection;
+use App\Models\CustomTransaction;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -4539,5 +4544,302 @@ class HomeController extends Controller
             return response()->json(['status' => 400, 'errors' => $e->getMessage()]);
         }
     }
-}
 
+    public function smartCollectionsList(Request $request)
+    {
+        try {
+            $currentPage = $request->input('page_no', 1);
+            $pageLimit = env('PAGE_LIMIT', 10); // fallback to 10 if not set
+            $offset = ($currentPage - 1) * $pageLimit;
+
+            $query = SmartCollection::with(['items'])->where('status', 1)->orderByDesc('id');
+            $totalRows = $query->count();
+            $totalPages = ceil($totalRows / $pageLimit);
+            $morePage = $this->common->more_page($currentPage, $totalPages);
+
+            $collections = $query->offset($offset)->limit($pageLimit)->get();
+
+            $pagination = $this->common->pagination_array($totalRows, $totalPages, $currentPage, $morePage);
+
+            return $this->common->API_Response(200, 'Smart collections retrieved successfully', $collections, $pagination);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 400,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function smartCollectionById(Request $request)
+    {
+        try {
+            $id = $request->input('smart_collection_id');
+
+            if (!$id) {
+                return $this->common->API_Response(422, 'smart_collection_id is required');
+            }
+
+            $collection = SmartCollection::with('items')->where('status', 1)->find($id);
+
+            if (!$collection) {
+                return $this->common->API_Response(404, 'Smart collection not found');
+            }
+
+            return $this->common->API_Response(200, 'Smart collection retrieved successfully', $collection);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 400,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function createCustomPackagePriorPayment(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'price' => 'required|numeric',
+                'time' => ['required', 'regex:/^\d+$/'],
+                'type' => 'required|in:Day,Week,Month,Year',
+                'smart_collection_ids' => 'required|array',
+                'smart_collection_ids.*' => 'exists:tbl_smart_collections,id',
+                'user_id' => 'required|exists:tbl_user,id',
+            ],
+            [
+                'price.required' => 'Price is required.',
+                'price.numeric' => 'Price must be a number.',
+                'time.required' => 'Time duration is required.',
+                'time.regex' => 'Time must be a whole number (e.g. 1, 2, 30).',
+                'type.required' => 'Package type is required.',
+                'type.in' => 'Type must be one of: Day, Week, Month, or Year.',
+                'smart_collection_ids.required' => 'At least one smart collection must be selected.',
+                'smart_collection_ids.array' => 'Smart collections must be an array.',
+                'smart_collection_ids.*.exists' => 'One or more selected smart collections are invalid.',
+                'user_id.required' => 'User is required.',
+                'user_id.exists' => 'Selected user does not exist.',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 400,
+                'message' => $validator->errors()->first()
+            ]);
+        }
+
+        $postData = $validator->validated();
+
+        DB::beginTransaction();
+
+        try {
+            $user = User::find($postData['user_id']);
+            $packageName = $user->full_name . ' - ' . $postData['type'] . ' Package';
+
+            $customPackage = CustomPackage::create([
+                'name' => $packageName,
+                'price' => $postData['price'],
+                'currency_type' => currency_code(),
+                'time' => $postData['time'],
+                'type' => $postData['type'],
+                'status' => 0,  // Set status to 0 before payment
+            ]);
+
+            foreach ($postData['smart_collection_ids'] as $smartCollectionId) {
+                CustomPackageSmartCollection::create([
+                    'custom_package_id' => $customPackage->id,
+                    'smart_collection_id' => $smartCollectionId,
+                ]);
+            }
+
+            DB::commit();
+
+            // Return the created custom package data in the response
+            return $this->common->API_Response(200, __('Custom package created successfully, awaiting payment.'), [
+                'custom_package' => $customPackage
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 400,
+                'errors' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function confirmPackagePayment(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'user_id' => 'required|exists:tbl_user,id',
+                'custom_package_id' => 'required|exists:tbl_custom_packages,id',
+                'payment_id' => 'required|string',
+                'amount' => 'required|numeric',
+            ],
+            [
+                'user_id.required' => 'User is required.',
+                'user_id.exists' => 'User not found.',
+                'custom_package_id.required' => 'Custom package ID is required.',
+                'custom_package_id.exists' => 'Custom package not found.',
+                'payment_id.required' => 'Payment ID is required.',
+                'amount.required' => 'Amount is required.',
+                'amount.numeric' => 'Amount must be numeric.',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 400,
+                'message' => $validator->errors()->first()
+            ]);
+        }
+
+        $postData = $validator->validated();
+
+        DB::beginTransaction();
+
+        try {
+            $customPackage = CustomPackage::find($postData['custom_package_id']);
+
+            if ($customPackage->status == 1) {
+                return response()->json(['message' => 'Package already activated.'], 400);
+            }
+
+            // Update custom package status to 1 (activated)
+            $customPackage->update([
+                'status' => 1,
+            ]);
+
+            // Calculate expiry date
+            $expiry_date = date('Y-m-d', strtotime('+' . $customPackage->time . ' ' . strtolower($customPackage->type)));
+
+            // Create the transaction
+            CustomTransaction::create([
+                'user_id' => $postData['user_id'],
+                'custom_package_id' => $customPackage->id,
+                'amount' => $postData['amount'],
+                'payment_id' => $postData['payment_id'],
+                'currency_code' => currency_code(),
+                'expiry_date' => $expiry_date,
+                'status' => 1, // Assuming successful transaction
+            ]);
+
+            DB::commit();
+
+            // Success response
+            return $this->common->API_Response(200, __('Payment confirmed and package activated successfully.'));
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 400,
+                'errors' => $e->getMessage()
+            ]);
+        }
+    }  
+
+    public function userCustomPackagesAllData(Request $request)
+    {
+        try {
+            // Validate request
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'user_id' => 'required|exists:tbl_user,id',
+                ],
+                [
+                    'user_id.required' => 'User is required.',
+                    'user_id.exists' => 'Selected user does not exist.',
+                ]
+            );
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => $validator->errors()->first()
+                ]);
+            }
+
+            // Fetch the user
+            $user = User::find($request->user_id);
+
+            if (!$user) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'User not found.'
+                ]);
+            }
+
+            // Fetch user's custom packages with smart collections and items
+            $customPackages = $user->customPackages()
+                ->with(['smartCollections.items'])
+                ->get();
+
+            // Success response
+            return $this->common->API_Response(200, __('Custom packages fetched successfully'), [
+                'custom_packages' => $customPackages
+            ]);
+            
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 400,
+                'errors' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function userSmartCollections(Request $request)
+    {
+        try {
+            // Validate request
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'user_id' => 'required|exists:tbl_user,id',
+                ],
+                [
+                    'user_id.required' => 'User is required.',
+                    'user_id.exists' => 'Selected user does not exist.',
+                ]
+            );
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => $validator->errors()->first()
+                ]);
+            }
+
+            // Get user
+            $user = User::find($request->user_id);
+
+            if (!$user) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'User not found.'
+                ]);
+            }
+
+            // Get unique smart collections with items
+            $smartCollections = $user->customPackages()
+                ->with('smartCollections.items')
+                ->get()
+                ->pluck('smartCollections')
+                ->flatten()
+                ->unique('id')
+                ->values();
+
+            // Success response
+            return $this->common->API_Response(200, __('Smart collections fetched successfully'), $smartCollections);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 400,
+                'errors' => $e->getMessage()
+            ]);
+        }
+    }
+}

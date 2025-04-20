@@ -213,7 +213,9 @@
         'enter_video_name' =>"Enter Video Name",
         'enter_audio_name' =>"Enter Audio Name",
         'enter_e_book_name' =>"Enter E-Book Name",
+        'enter_smart_collection_name' =>"Enter Smart Collection Name",
         'enter_price' =>"Enter Price",
+        'enter_description' =>"Enter Description",
         'hello' =>"HELLO",
         'select_category' =>"Select Category",
         'select_language' =>"Select Language",
@@ -376,8 +378,11 @@
         'error_change_pass' => "Password Not Change.",
         'you_have_no_right_to_add_edit_and_delete' => "You have no right to add, edit, and delete.",
 
-
-
+        // Custom Subscription
+        'custom_subscription' => "Custom Subcription",
+        'smart_collection' => "Smart Collection",
+        'create_smart_collection_by' => "Create Smart Collection By",
+        'custom_package' => "Custom Package",
     ];
 
 ?>

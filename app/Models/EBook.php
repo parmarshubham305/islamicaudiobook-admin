@@ -38,6 +38,8 @@ class EBook extends Model
 
     ];
 
+    protected $appends = ['image_url', 'file_url'];
+
     public function category()
     {
         return $this->belongsTo(Category::class,'category_id');
@@ -55,5 +57,25 @@ class EBook extends Model
     public function multipleEbooks()
     {
         return $this->hasMany(MultipleEbook::class, 'ebook_id');
+    }
+
+    /**
+     * Get full image URL or default placeholder.
+     */
+    public function getImageUrlAttribute()
+    {
+        return $this->image
+            ? url('public/storage/e-books/' . $this->image)
+            : asset('assets/imgs/default-image.png');
+    }
+
+    /**
+     * Get full file URL or default placeholder.
+     */
+    public function getFileUrlAttribute()
+    {
+        return $this->upload_file
+            ? url('public/storage/e-books/' . $this->upload_file)
+            : null;
     }
 }

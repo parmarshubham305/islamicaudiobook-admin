@@ -35,5 +35,8 @@ class Video extends Model
     {
         return $this->belongsTo(Artist::class,'artist_id');
     }
-    
+
+    public function smartCollections() {
+        return $this->morphToMany(SmartCollection::class, 'item', 'tbl_smart_collection_items');
+    }
 }

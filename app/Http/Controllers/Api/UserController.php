@@ -419,7 +419,7 @@ class UserController extends Controller
             }
 
             $user_id =$request->user_id;
-            $user_data =User::where('id',$user_id)->first();
+            $user_data = User::with(['customPackages'])->where('id',$user_id)->first();
             if(!empty($user_data)){
 
                 $path = $this->common->getImagePath($this->folder, $user_data['image']);

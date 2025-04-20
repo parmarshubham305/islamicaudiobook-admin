@@ -22,6 +22,8 @@ class Audio extends Model
 
     ];
 
+    protected $appends = ['image_url', 'file_url', 'multiple_audio_files'];
+
     public function category()
     {
         return $this->belongsTo(Category::class,'category_id');
@@ -36,5 +38,33 @@ class Audio extends Model
         return $this->belongsTo(Artist::class,'artist_id');
     }
 
-    
+    public function multipleAudioFiles()
+    {
+        return $this->hasMany(MultipleAudio::class, 'audio_id');
+    }
+
+    /**
+     * Get full image URL or default placeholder.
+     */
+    public function getImageUrlAttribute()
+    {
+        return $this->image
+            ? url('public/storage/audio/' . $this->image)
+            : asset('assets/imgs/default-image.png');
+    }
+
+    /**
+     * Get full file URL or default placeholder.
+     */
+    public function getFileUrlAttribute()
+    {
+        return $this->upload_file
+            ? url('public/storage/audio/' . $this->upload_file)
+            : null;
+    }
+
+    public function getMultipleAudioFilesAttribute()
+    {
+        return $this->multipleAudioFiles()->get();
+    }
 }
