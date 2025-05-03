@@ -28,6 +28,7 @@ use App\Models\SmartCollectionItem;
 use App\Models\CustomPackage;
 use App\Models\CustomPackageSmartCollection;
 use App\Models\CustomTransaction;
+use App\Models\EBook_Transaction;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -4017,7 +4018,22 @@ class HomeController extends Controller
                     $ra->full_name = $ra->user['full_name'] ?? "";
                     $ra->user_name = $ra->user['user_name'] ?? "";
                     $ra->profile_img = isset($ra->user) ? $this->common->getImagePath($this->folder, $ra->user['image']) : asset('/assets/imgs/users.png');
-                    $ra->is_purchased = 0;
+
+                    $record_purchase = DB::select(
+                        'select is_purchased from tbl_ebook_transaction where ebook_id = :ebook_id and user_id = :user_id and status = :status and is_purchased = :is_purchased',
+                        [
+                            'ebook_id' => $ra->id,
+                            'user_id' => $user_id,
+                            'status' => 1,
+                            'is_purchased' => 1
+                        ]
+                    );
+
+                    if (!empty($record_purchase) || $ra->is_paid == 0) {
+                        $ra->is_purchased = 1;
+                    } else{
+                        $ra->is_purchased = 0;
+                    }
     
                     $dataarray[] = $ra;
                     unset($ra->category, $ra->user, $ra->author);
@@ -4535,7 +4551,21 @@ class HomeController extends Controller
                 ? $this->common->getImagePath($this->folder, $ra->user['image'])
                 : asset('/assets/imgs/users.png');
 
-            $ra->is_purchased = 0; // default value (modify if logic available)
+            $record_purchase = DB::select(
+                'select is_purchased from tbl_ebook_transaction where ebook_id = :ebook_id and user_id = :user_id and status = :status and is_purchased = :is_purchased',
+                [
+                    'ebook_id' => $ra->id,
+                    'user_id' => $user_id,
+                    'status' => 1,
+                    'is_purchased' => 1
+                ]
+            );
+
+            if (!empty($record_purchase) || $ra->is_paid == 0) {
+                $ra->is_purchased = 1;
+            } else{
+                $ra->is_purchased = 0;
+            }
 
             // unset($ra->category, $ra->user, $ra->artist);
 
@@ -4840,6 +4870,68 @@ class HomeController extends Controller
                 'status' => 400,
                 'errors' => $e->getMessage()
             ]);
+        }
+    }
+
+    public function Add_EBook_transaction(Request $request)
+    {
+        try{
+            $validation = Validator::make(
+                $request->all(),
+                [
+                    'user_id' => 'required|numeric',
+                    'amount' => 'required|numeric',
+                    'ebook_id' => 'required|numeric',
+                ]
+                // [
+                //     'user_id.required' => __('api_msg.user_id_required'),
+                //     'ebook_id.required' => __('api_msg.aiaudio_id_required'),
+                //     'amount.required' => __('api_msg.amount_required'),
+                // ]
+            );
+            if ($validation->fails()) {
+                $errors = $validation->errors()->first('user_id');
+                $errors1 = $validation->errors()->first('ebook_id');
+                $errors2 = $validation->errors()->first('amount');
+                $data['status'] = 400;
+                if ($errors) {
+                    $data['message'] = $errors;
+                } elseif ($errors1) {
+                    $data['message'] = $errors1;
+                } elseif ($errors2) {
+                    $data['message'] = $errors2;
+                }
+                return $data;
+            }
+
+            $user_id =$request->user_id;
+            $ebook_id =$request->ebook_id;
+            $amount =$request->amount;
+
+            $payment_id = isset($request->payment_id) ? $request->payment_id : "";
+            $currency_code = isset($request->currency_code) ? $request->currency_code : currency_code();
+
+            $Pdata = EBook::where('id',$ebook_id)->where('is_approved','1')->where('is_paid',"1")->first();
+            if(!empty($Pdata)){
+                $insert = new EBook_Transaction();
+                $insert->user_id =$user_id;
+                $insert->ebook_id = $ebook_id;
+                $insert->amount = $amount;
+                $insert->payment_id = $payment_id;
+                $insert->currency_code = $currency_code;
+                $insert->is_purchased = '1';
+                $insert->status = '1';
+            } else {
+                return $this->common->API_Response(400, __('Please enter valid ebook details'));
+            }
+
+            if (!empty($Pdata) && isset($insert) && $insert->save()){
+                return $this->common->API_Response(200, __('E-book purchase recorded successfully.'), array($insert));
+            } else {
+                return $this->common->API_Response(400, __('Failed to record e-book transaction. Please try again later.'));
+            }
+        }catch (Exception $e) {
+            return response()->json(array('status' => 400, 'errors' => $e->getMessage()));
         }
     }
 }

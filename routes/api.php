@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\RatingController;
+use App\Http\Controllers\Admin\SmartCollectionController;
 
  
 /*
@@ -145,6 +146,7 @@ Route::post('ebook_by_category', [HomeController::class, 'ebook_by_category'])->
 Route::post('get_ebook_timestamp', [HomeController::class, 'get_ebook_timestamp'])->name('get_ebook_timestamp');
 Route::post('ebook_view_timestamp', [HomeController::class, 'ebook_view_timestamp'])->name('ebook_view_timestamp');
 Route::post('ebook_by_id', [HomeController::class, 'ebook_by_id'])->name('ebook_by_id');
+Route::post('add_e_book_transaction', [HomeController::class, 'Add_EBook_transaction'])->name('Add_EBook_transaction');
 
 # ---------------- Customisable Package --------------
 // Smart Collection
