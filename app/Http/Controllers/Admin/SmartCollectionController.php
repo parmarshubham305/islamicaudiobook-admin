@@ -350,6 +350,109 @@ class SmartCollectionController extends Controller
         }
     }
 
+    public function addItemToSmartCollection(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'smart_collection_id' => 'required|exists:tbl_smart_collections,id',
+            'item_id' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $smartCollection = SmartCollection::findOrFail($request->smart_collection_id);
+            $itemId = $request->item_id;
+
+            // Check if item already assigned
+            $exists = SmartCollectionItem::where('smart_collection_id', $smartCollection->id)
+                        ->where('item_id', $itemId)
+                        ->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Item is already assigned to the smart collection.',
+                ], 409);
+            }
+
+            // Check if item is valid based on type
+            $item = null;
+            switch ($smartCollection->type) {
+                case 'e_book':
+                    $item = EBook::find($itemId);
+                    break;
+                case 'audio_book':
+                    $item = Audio::find($itemId);
+                    break;
+            }
+
+            if (!$item) { // Or use custom logic/method like $item->isValid()
+                return response()->json([
+                    'status' => false,
+                    'message' => 'The item is not valid or not found.',
+                ], 404);
+            }
+
+            // Assign item to smart collection
+            SmartCollectionItem::create([
+                'smart_collection_id' => $smartCollection->id,
+                'item_id' => $itemId,
+                'item_type' => $smartCollection->type,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Item added to smart collection successfully.',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getSmartCollectionsListByType(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'type' => 'required|string|in:e_book,audio_book', // Add more types if needed
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $collections = SmartCollection::where('type', $request->type)
+                ->orderBy('id', 'desc')
+                ->get();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Smart collections fetched successfully.',
+                'data' => $collections
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     // public function store(Request $request)
     // {
     //     ini_set('memory_limit', '-1');

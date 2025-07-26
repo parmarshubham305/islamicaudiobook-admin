@@ -392,13 +392,19 @@ class Common extends Model
 
         $data['is_favorite'] = "0";
         if ($user_id) {
-            $is_favorite = Bookmark::where('video_id', $id)->where('user_id', $user_id)->where('type', 'video')->first();
+            $is_favorite = Favourite::where('video_id', $id)->where('user_id', $user_id)->where('type', 'video')->first();
             if ($is_favorite) {
                 $data['is_favorite'] = "1";
             }
         }
 
-       
+        $data['is_bookmarked'] = "0";
+        if ($user_id) {
+            $is_bookmarked = Bookmark::where('video_id', $id)->where('user_id', $user_id)->where('type', 'video')->first();
+            if ($is_bookmarked) {
+                $data['is_bookmarked'] = "1";
+            }
+        }
        
         $data['is_download'] = "0";
         if ($user_id) {
@@ -440,9 +446,17 @@ class Common extends Model
 
         $data['is_favorite'] = "0";
         if ($user_id) {
-            $is_favorite = Bookmark::where('video_id', $id)->where('user_id', $user_id)->where('type', 'ebook')->first();
+            $is_favorite = Favourite::where('video_id', $id)->where('user_id', $user_id)->where('type', 'ebook')->first();
             if ($is_favorite) {
                 $data['is_favorite'] = "1";
+            }
+        }
+
+        $data['is_bookmarked'] = "0";
+        if ($user_id) {
+            $is_bookmarked = Bookmark::where('video_id', $id)->where('user_id', $user_id)->where('type', 'ebook')->first();
+            if ($is_bookmarked) {
+                $data['is_bookmarked'] = "1";
             }
         }
    
@@ -525,12 +539,19 @@ class Common extends Model
 
         $data['is_favorite'] = "0";
         if ($user_id) {
-            $is_favorite = Bookmark::where('video_id', $id)->where('user_id', $user_id)->where('type', 'audio')->first();
+            $is_favorite = Favourite::where('video_id', $id)->where('user_id', $user_id)->where('type', 'audio')->first();
             if ($is_favorite) {
                 $data['is_favorite'] = "1";
             }
         }
 
+        $data['is_bookmarked'] = "0";
+        if ($user_id) {
+            $is_bookmarked = Bookmark::where('video_id', $id)->where('user_id', $user_id)->where('type', 'audio')->first();
+            if ($is_bookmarked) {
+                $data['is_bookmarked'] = "1";
+            }
+        }
        
        
         $data['is_download'] = "0";
@@ -560,12 +581,19 @@ class Common extends Model
 
         $data['is_favorite'] = "0";
         if ($user_id) {
-            $is_favorite = Bookmark::where('video_id', $id)->where('user_id', $user_id)->where('type', 'aiaudio')->first();
+            $is_favorite = Favourite::where('video_id', $id)->where('user_id', $user_id)->where('type', 'aiaudio')->first();
             if ($is_favorite) {
                 $data['is_favorite'] = "1";
             }
         }
 
+        $data['is_bookmarked'] = "0";
+        if ($user_id) {
+            $is_bookmarked = Bookmark::where('video_id', $id)->where('user_id', $user_id)->where('type', 'aiaudio')->first();
+            if ($is_bookmarked) {
+                $data['is_bookmarked'] = "1";
+            }
+        }
        
        
         $data['is_download'] = "0";

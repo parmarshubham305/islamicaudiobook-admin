@@ -14,6 +14,7 @@ use App\Models\Like;
 use App\Models\View;
 use App\Models\Follow;
 use App\Models\Bookmark;
+use App\Models\Favourite;
 use App\Models\Download;
 use App\Models\General_Setting;
 use Illuminate\Http\Request;
@@ -651,7 +652,188 @@ class RatingController extends Controller
         }
     }
 
+    // Favourite
     public function add_favorite(Request $request)
+    {
+        try {
+            if (isset($request['user_id']) && $request['video_id'] && $request['type']) {
+                $user_id = $request['user_id'];
+                $video_id = $request['video_id'];
+                $type = $request['type'];
+
+                $resultr_con = Favourite::where('user_id', $user_id)->where('type', $type)->where('video_id', $video_id)->first();
+
+                if (isset($resultr_con['id'])) {
+
+                    Favourite::where('user_id', $user_id)->where('video_id', $video_id)->where('type', $type)->delete();
+                    return $this->common->API_Response(200, "Remove Favorite");
+
+                } else {
+
+                    $data = array(
+                        'user_id' => $user_id,
+                        'video_id' => $video_id,
+                        'type' => $type,
+                    );
+                    Favourite::insertGetId($data);
+
+                    return $this->common->API_Response(200, "Add Favorite");
+                }
+            } else {
+                return $this->common->API_Response(200, __('api_msg.please_enter_required_fields'));
+            }
+        } catch (Exception $e) {
+            return response()->json(array('status' => 400, 'errors' => $e->getMessage()));
+        }
+    }
+
+    public function favorite_list(Request $request)
+    {
+        Log::info($request->all());
+        try {
+            if (isset($request['user_id']) && isset($request['type'])) {
+
+                $user_id = $request['user_id'];
+                $type = $request['type'];
+
+                $page_size = 0;
+                $current_page = 0;
+                $more_page = false;
+                $page_limit = env('PAGE_LIMIT');
+
+                $result = Favourite::select('video_id')->where('type', $type)->where('user_id', $user_id)->get();
+                //echo "<pre>";print_r($result);exit;
+                $videoarray = array();
+                foreach ($result as $row) {
+                    $videoarray[] = $row->video_id;
+                }
+                $video_ids = implode(',', array_map('intval', $videoarray));
+
+                $Ids = explode(',', $video_ids);
+                if($type == 'video'){
+                    $data = Video::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with('category')->orderBy('created_at', 'desc');
+                }if($type == 'ebook'){
+                    $data = EBook::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with('category')->orderBy('created_at', 'desc');
+                }else if($type == 'aiaudio'){
+                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"1")->with('category')->orderBy('created_at', 'desc');
+                }else{
+                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"0")->with('category')->orderBy('created_at', 'desc');
+                }
+                
+
+                $total_rows = $data->count();
+
+                $total_page = $page_limit;
+                $page_size = ceil($total_rows / $total_page);
+                $current_page = $request->page_no ?? 1;
+                $offset = $current_page * $total_page - $total_page;
+                $data->take($total_page)->offset($offset);
+
+                $more_page = $this->common->more_page($current_page, $page_size);
+
+                $data = $data->get()->toArray();
+
+                $pagination = $this->common->pagination_array($total_rows, $page_size, $current_page, $more_page);
+
+                $dataarray = [];
+
+                foreach ($data as $ra) {
+                    if($type == 'video'){
+                        $datas = $this->common->get_all_count_for_video($ra['id'], $user_id);
+                        $ra = (object) array_merge((array) $ra, $datas);
+                        $ra->image = $this->common->getImagePath($this->folder_video, $ra->image);
+                        if($ra->video_type =="server_video"){
+                            $ra->url = $this->common->getImagePath($this->folder_video, $ra->url);
+                        }
+                    } else if($type == 'ebook'){
+                        $datas = $this->common->get_all_count_for_ebook($ra['id'], $user_id);
+                        $ra = (object) array_merge((array) $ra, $datas);
+                        $ra->image = $this->common->getImagePath($this->folder_ebook, $ra->image);
+                    } else if($type == 'aiaudio'){
+                        $datas = $this->common->get_all_count_for_ai_audio($ra['id'], $user_id);
+                        $ra = (object) array_merge((array) $ra, $datas);
+                        $ra->image = $this->common->getImagePath($this->folder_audio, $ra->image);
+                        if($ra->video_type =="server_video"){
+                            $ra->url = $this->common->getImagePath($this->folder_audio, $ra->url);
+                        }
+                    }else{
+                        $datas = $this->common->get_all_count_for_audio($ra['id'], $user_id);
+                        $ra = (object) array_merge((array) $ra, $datas);
+                        $ra->image = $this->common->getImagePath($this->folder_audio, $ra->image);
+                        if($ra->video_type =="server_video"){
+                            $ra->url = $this->common->getImagePath($this->folder_audio, $ra->url);
+                        }
+                    }
+                    
+    
+                    $ra->is_like = "0";
+                    if ($user_id != 0) {
+                        $ra->is_like = $this->common->is_like($request['user_id'], $ra->id);
+                    }
+    
+                    $ra->category_name = "";
+                    if (isset($ra->category['name'])) {
+                        $ra->category_name = $ra->category['name'];
+                    }
+    
+                    $ra->artist_name = "";
+                    if (isset($ra->artist['name'])) {
+                        $ra->artist_name = $ra->artist['name'];
+                        $ra->artist_image = $this->common->getImagePath($this->folder_artist, $ra->artist['image']);
+    
+                    }
+    
+                    $ra->full_name = "";
+                    $ra->user_name = "";
+                    $ra->profile_img = asset('/assets/imgs/users.png');
+                    if (isset($ra->user)) {
+                        $ra->full_name = $ra->user['full_name'];
+                        $ra->user_name = $ra->user['user_name'];
+                        $ra->profile_img = $this->common->getImagePath($this->folder2, $ra->user['image']);
+                    }
+                    
+                    if($type == 'aiaudio'){
+                        $record_purchase = DB::select(
+                            'select is_purchased from tbl_aiaudio_transaction where aiaudio_id = :aiaudio_id and user_id = :user_id and status = :status and is_purchased = :is_purchased',
+                            [
+                                'aiaudio_id' => $ra->id,
+                                'user_id' => $user_id,
+                                'status' => 1,
+                                'is_purchased' => 1
+                            ]
+                        );
+                        if (!empty($record_purchase) || $ra->is_paid == 0) {
+                            $ra->is_purchased = 1;
+                        }else{
+                            $ra->is_purchased = 0;
+                        }
+                    }
+    
+                    $dataarray[] = $ra;
+                    unset($ra->category, $ra->user, $ra->artist);
+                   
+                }
+
+                if($type == 'video'){
+                    return $this->common->API_Response(200, __('Video Record favorite list Get successully'), $dataarray, $pagination);
+                }else if($type == 'aiaudio'){
+                    return $this->common->API_Response(200, __('AI Audio favorite list Record Get successully.'), $dataarray, $pagination);
+                }else if($type == 'ebook'){
+                    return $this->common->API_Response(200, __('E-Book favorite list Record Get successully.'), $dataarray, $pagination);
+                }else{
+                    return $this->common->API_Response(200, __('Audio Record favorite list Get successully.'), $dataarray, $pagination);
+                }
+            } else {
+                return $this->common->API_Response(200, __('api_msg.please_enter_required_fields'));
+            }
+        } catch (Exception $e) {
+            return response()->json(array('status' => 400, 'errors' => $e->getMessage()));
+        }
+    }
+    // End Favourite
+
+    // Bookmark
+    public function add_bookmark(Request $request)
     {
         try {
             if (isset($request['user_id']) && $request['video_id'] && $request['type']) {
@@ -685,7 +867,7 @@ class RatingController extends Controller
         }
     }
 
-    public function favorite_list(Request $request)
+    public function bookmark_list(Request $request)
     {
         Log::info($request->all());
         try {
@@ -828,6 +1010,7 @@ class RatingController extends Controller
             return response()->json(array('status' => 400, 'errors' => $e->getMessage()));
         }
     }
+    // End Bookmark
 
     // Follow
 

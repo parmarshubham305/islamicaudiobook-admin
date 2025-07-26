@@ -169,6 +169,8 @@ Route::group(['prefix' => 'admin','middleware' => 'adminauth'], function()  {
     Route::resource('custom-package', CustomPackageController::class)->only(['create', 'store', 'edit', 'update', 'show', 'destroy']);
     Route::resource('smart-collection', SmartCollectionController::class);
     Route::get('smart-collection/delete/{id}', [EBookController::class, 'deleteSmartCollection'])->name('smart-collection.deleteSmartCollection');
+    Route::post('smart-collection/add-item', [SmartCollectionController::class, 'addItemToSmartCollection'])->name('smart-collection.add-item');
+    Route::post('smart-collections/get-list/by-type', [SmartCollectionController::class, 'getSmartCollectionsListByType'])->name('smart-collection.lis-by-type');
     Route::resource('custom-transaction', CustomTransactionController::class);
     Route::post('smart-collection/e-books/get-all', [SmartCollectionController::class, 'getAllEbooks'])->name('smart-collection.ebooks.get-all');
     Route::post('smart-collection/audio-books/get-all', [SmartCollectionController::class, 'getAllAudioBooks'])->name('smart-collection.audiobooks.get-all');

@@ -4008,7 +4008,7 @@ class HomeController extends Controller
     
                 $dataarray = [];                
                 foreach ($data as $ra) {
-                    $ra['file_url'] = url('public/storage/e-book/' . $ra['upload_file']);
+                    $ra['file_url'] = url('storage/documents/' . $ra['upload_file']);
                     $data1 = $this->common->get_all_count_for_ebook($ra['id'], $user_id, $ra['user_id']);
                     $ra = (object) array_merge((array) $ra, $data1);
 

@@ -130,6 +130,9 @@ Route::post('get_album_by_ai_audio', [HomeController::class, 'Get_Album_By_AI_Au
 Route::post('add_favorite', [RatingController::class, 'add_favorite']);
 Route::post('favorite_list', [RatingController::class, 'favorite_list']);
 
+Route::post('add_bookmark', [RatingController::class, 'add_bookmark']);
+Route::post('bookmark_list', [RatingController::class, 'bookmark_list']);
+
 Route::post('like_dislike', [RatingController::class, 'like_dislike'])->name('like_dislike');
 Route::post('get_like_audio', [HomeController::class, 'get_like_audio'])->name('get_like_audio');
 Route::post('get_like_ai_audio', [HomeController::class, 'get_like_ai_audio'])->name('get_like_ai_audio');
