@@ -846,7 +846,7 @@ class RatingController extends Controller
                 if (isset($resultr_con['id'])) {
 
                     Bookmark::where('user_id', $user_id)->where('video_id', $video_id)->where('type', $type)->delete();
-                    return $this->common->API_Response(200, "Remove Favorite");
+                    return $this->common->API_Response(200, "Remove Bookmark");
 
                 } else {
 
@@ -857,7 +857,7 @@ class RatingController extends Controller
                     );
                     Bookmark::insertGetId($data);
 
-                    return $this->common->API_Response(200, "Add Favorite");
+                    return $this->common->API_Response(200, "Add Bookmark");
                 }
             } else {
                 return $this->common->API_Response(200, __('api_msg.please_enter_required_fields'));
@@ -995,13 +995,13 @@ class RatingController extends Controller
                 }
 
                 if($type == 'video'){
-                    return $this->common->API_Response(200, __('Video Record favorite list Get successully'), $dataarray, $pagination);
+                    return $this->common->API_Response(200, __('Video Record bookmark list Get successully'), $dataarray, $pagination);
                 }else if($type == 'aiaudio'){
-                    return $this->common->API_Response(200, __('AI Audio favorite list Record Get successully.'), $dataarray, $pagination);
+                    return $this->common->API_Response(200, __('AI Audio bookmark list Record Get successully.'), $dataarray, $pagination);
                 }else if($type == 'ebook'){
-                    return $this->common->API_Response(200, __('E-Book favorite list Record Get successully.'), $dataarray, $pagination);
+                    return $this->common->API_Response(200, __('E-Book bookmark list Record Get successully.'), $dataarray, $pagination);
                 }else{
-                    return $this->common->API_Response(200, __('Audio Record favorite list Get successully.'), $dataarray, $pagination);
+                    return $this->common->API_Response(200, __('Audio Record bookmark list Get successully.'), $dataarray, $pagination);
                 }
             } else {
                 return $this->common->API_Response(200, __('api_msg.please_enter_required_fields'));
