@@ -75,7 +75,7 @@ class EBook extends Model
     public function getFileUrlAttribute()
     {
         return $this->upload_file
-            ? url('public/storage/e-books/' . $this->upload_file)
+            ? url('storage/documents/' . $this->upload_file)
             : null;
     }
 }
