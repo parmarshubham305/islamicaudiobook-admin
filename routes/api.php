@@ -168,3 +168,5 @@ Route::post('custom_package/confirm_payment', [HomeController::class, 'confirmPa
 
 
 Route::post('audio_books_list', [HomeController::class, 'audio_books_list'])->name('audio_books_list');
+Route::post('trending_audio_books', [HomeController::class, 'trending_audio_books'])->name('trending_audio_books');
+Route::post('trending_e_books', [HomeController::class, 'trending_e_books'])->name('trending_audtrending_e_booksio_books');
