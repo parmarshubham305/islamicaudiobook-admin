@@ -143,15 +143,6 @@
                             </div>
 
                             <div class="col-md-3 mb-3">
-                                <div class="form-group IS Paid">
-                                    <label for="download">{{__('label.IS Paid')}}</label>
-                                    <select class="form-control" name="is_paid">
-                                    <option value="0" {{ $data->is_paid == 0  ? 'selected' : ''}}>{{__('label.free')}}</option>
-                                    <option value="1" {{ $data->is_paid == 1  ? 'selected' : ''}}>{{__('label.paid')}}</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
                                 <div class="form-group Is_Download">
                                     <label for="download">{{__('label.Feature')}}</label>
                                     <select class="form-control" name="is_feature">
@@ -164,6 +155,35 @@
                                 <div class="form-group">
                                     <label for="name">{{__('label.price')}}</label>
                                     <input type="text" name="price" value="@if($data){{$data->price}}@endif" class="form-control" placeholder="{{__('label.enter_price')}}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <div class="form-group IS Paid">
+                                    <label for="download">IS Paid</label>
+                                    <select class="form-control" name="is_paid" id="is_paid">
+                                    <option value="0" {{ $data->is_paid == 0  ? 'selected' : ''}}>{{__('label.free')}}</option>
+                                    <option value="1" {{ $data->is_paid == 1  ? 'selected' : ''}}>{{__('label.paid')}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 mb-3" id="package_id_div">
+                                <div class="form-group">
+                                    <label for="download">Subscription Package</label>
+                                    @php
+                                        use App\Models\Package;
+                                        $packages = Package::all();
+                                        $subscribedPackageIds = $data->subscriptions->pluck('id')->toArray(); // Safely collect IDs
+                                    @endphp
+
+                                    <select class="form-control" name="package_id[]" multiple id="package_id">
+                                        @foreach($packages as $package)
+                                            <option value="{{ $package->id }}" {{ in_array($package->id, $subscribedPackageIds ?? []) ? 'selected' : '' }}>
+                                                {{ $package->name ?? 'Unnamed Package' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -379,6 +399,16 @@
             }
        
         $(document).ready(function() {
+            let is_paid = $("#is_paid").val();
+            console.log("is_paid : ", is_paid);
+
+            if (is_paid == 0) {
+                $("#package_id").val([]);
+                $("#package_id_div").hide();
+            } else {
+                $("#package_id_div").show();
+            }
+
             let audioIdToDelete;
             
             $("#type").change(function() {
@@ -392,6 +422,24 @@
                     }
                 });
             }).change();
+
+            $('#package_id').select2({
+                placeholder: 'Select...',
+                allowClear: true,
+                width: '100%'
+            });
+
+            $(document).on('change', '#is_paid', function() {
+                let is_paid = $(this).val();
+                console.log("is_paid : ", is_paid);
+
+                if (is_paid == 0) {
+                    $("#package_id").val([]);
+                    $("#package_id_div").hide();
+                } else {
+                    $("#package_id_div").show();
+                }
+            });
             
             $('#container').on('click', '.add-another-audio', function() {
                 let audioContainer = $(this).closest('#container').find('.audio-container').first();

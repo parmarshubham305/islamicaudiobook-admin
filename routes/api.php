@@ -172,5 +172,6 @@ Route::post('trending_audio_books', [HomeController::class, 'trending_audio_book
 Route::post('trending_e_books', [HomeController::class, 'trending_e_books'])->name('trending_audtrending_e_booksio_books');
 Route::post('search_filter_audio', [HomeController::class, 'search_filter_audio'])->name('search_filter_audio');
 Route::post('search_filter_ebook', [HomeController::class, 'searchEbookList'])->name('search_filter_ebook');
+Route::post('get_subscription_all_modules', [HomeController::class, 'getSubscriptionAllModules'])->name('get_subscription_all_modules');
 
 

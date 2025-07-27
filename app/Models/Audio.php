@@ -73,4 +73,9 @@ class Audio extends Model
     {
         return $this->multipleAudioFiles()->get();
     }
+
+    public function subscriptions()
+    {
+        return $this->morphToMany(Package::class, 'entity', 'subscription_entities');
+    }
 }

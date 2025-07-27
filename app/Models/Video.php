@@ -46,4 +46,9 @@ class Video extends Model
     public function smartCollections() {
         return $this->morphToMany(SmartCollection::class, 'item', 'tbl_smart_collection_items');
     }
+
+    public function subscriptions()
+    {
+        return $this->morphToMany(Package::class, 'entity', 'subscription_entities');
+    }
 }

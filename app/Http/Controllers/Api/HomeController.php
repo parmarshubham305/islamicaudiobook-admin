@@ -5348,4 +5348,15 @@ class HomeController extends Controller
             return response()->json(['status' => 400, 'errors' => $e->getMessage()]);
         }
     }
+
+    public function getSubscriptionAllModules()
+    {
+        $packages = Package::with(['audios', 'videos', 'ebooks'])->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'All subscription modules fetched successfully.',
+            'data' => $packages
+        ]);
+    }
 }

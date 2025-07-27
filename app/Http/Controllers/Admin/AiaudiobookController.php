@@ -78,6 +78,8 @@ class AiaudiobookController extends Controller
                     'subcategory_id' => 'nullable|integer',
                     'description' => 'required',    
                     'audio' => 'required',   
+                    'package_id' => 'nullable|array',
+                    'package_id.*' => 'exists:tbl_package,id'
                 ]);
             }else{
                 $validator = Validator::make($request->all(), [
@@ -91,7 +93,9 @@ class AiaudiobookController extends Controller
                         // 'file',
                         // 'max:10000', // Set a reasonable maximum file size (in kilobytes)
                         // 'mimes:mpga,wav,mp3',
-                    ],   
+                    ],
+                    'package_id' => 'nullable|array',
+                    'package_id.*' => 'exists:tbl_package,id'
                 ]);
             }
             
@@ -131,6 +135,14 @@ class AiaudiobookController extends Controller
             // echo "<pre>";print_r($requestData);exit;
             $audio_data = Audio::updateOrCreate(['id' => $requestData['id']], $requestData);
             if(isset($audio_data->id)){
+
+                if (!empty($requestData['package_id']) && is_array($requestData['package_id'])) {
+                    // Sync polymorphic many-to-many relation
+                    $audio_data->subscriptions()->sync($requestData['package_id']);
+                } else {
+                    // Remove all package relations if none selected
+                    $audio_data->subscriptions()->detach();
+                }
                 
                 if($request->isAudioTab == 0){
                     $audioFiles = $request->file('audio');
@@ -206,6 +218,8 @@ class AiaudiobookController extends Controller
                     'category_id' => 'required',
                     'subcategory_id' => 'nullable|integer',
                     'description' => 'required',
+                    'package_id' => 'nullable|array',
+                    'package_id.*' => 'exists:tbl_package,id'
                 ];
                 
                 if($totalAudios <= 0 && !isset($requestData['audio'])){
@@ -248,6 +262,15 @@ class AiaudiobookController extends Controller
             }
             $audio_data = Audio::updateOrCreate(['id' => $requestData['id']], $requestData);
             if (isset($audio_data->id)) {
+
+                if (!empty($requestData['package_id']) && is_array($requestData['package_id'])) {
+                    // Sync polymorphic many-to-many relation
+                    $audio_data->subscriptions()->sync($requestData['package_id']);
+                } else {
+                    // Remove all package relations if none selected
+                    $audio_data->subscriptions()->detach();
+                }
+
                 if($request->isAudioTab == 0){
                     $audioFiles = $request->file('audio');
                     if(!empty($audioFiles)){  

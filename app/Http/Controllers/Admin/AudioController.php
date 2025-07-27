@@ -73,6 +73,8 @@ class AudioController extends Controller
                     'subcategory_id' => 'nullable|integer',
                     'mp3_file_name' => 'required',
                     'description' => 'required',
+                    'package_id' => 'nullable|array',
+                    'package_id.*' => 'exists:tbl_package,id'
     
                 ]);
             } else {
@@ -87,7 +89,9 @@ class AudioController extends Controller
                         'required',
                         'file', // Set a reasonable maximum file size (in kilobytes)
                         'mimes:mpga,wav,mp3',
-                    ],   
+                    ],
+                    'package_id' => 'nullable|array',
+                    'package_id.*' => 'exists:tbl_package,id'
                 ]);
             }
            
@@ -118,6 +122,14 @@ class AudioController extends Controller
             $video_data = Audio::updateOrCreate(['id' => $requestData['id']], $requestData);
 
             if(isset($video_data->id)){
+
+                if (!empty($requestData['package_id']) && is_array($requestData['package_id'])) {
+                    // Sync polymorphic many-to-many relation
+                    $video_data->subscriptions()->sync($requestData['package_id']);
+                } else {
+                    // Remove all package relations if none selected
+                    $video_data->subscriptions()->detach();
+                }
 
                 // Send Notification  
                 //$imageURL= $this->common->imageNameToUrl(array($video_data), 'image', $this->folder);
@@ -197,6 +209,8 @@ class AudioController extends Controller
                     'category_id' => 'required',
                     'subcategory_id' => 'nullable|integer',
                     'description' => 'required',
+                    'package_id' => 'nullable|array',
+                    'package_id.*' => 'exists:tbl_package,id'
                 ]);
             } else {
                 $validator = Validator::make($request->all(), [
@@ -205,7 +219,9 @@ class AudioController extends Controller
                     'category_id' => 'required',
                     'subcategory_id' => 'nullable|integer',
                     //'url' => 'required',
-                    'description' => 'required',    
+                    'description' => 'required',
+                    'package_id' => 'nullable|array',
+                    'package_id.*' => 'exists:tbl_package,id' 
                     // 'audio' => [
                     //     'required',
                     //     'file',
@@ -239,6 +255,14 @@ class AudioController extends Controller
 
             $video_data = Audio::updateOrCreate(['id' => $requestData['id']], $requestData);
             if (isset($video_data->id)) {
+
+                if (!empty($requestData['package_id']) && is_array($requestData['package_id'])) {
+                    // Sync polymorphic many-to-many relation
+                    $video_data->subscriptions()->sync($requestData['package_id']);
+                } else {
+                    // Remove all package relations if none selected
+                    $video_data->subscriptions()->detach();
+                }
                 return response()->json(array('status' => 200, 'success' => __('label.audio_update')));
             } else {
                 return response()->json(array('status' => 400, 'errors' => __('label.audio_not_update')));

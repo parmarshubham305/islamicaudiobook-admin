@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\Artist;
 use App\Models\Album;
 use App\Models\User;
+use App\Models\Package;
 use DataTables;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -99,7 +100,9 @@ class EBookController extends Controller
                         // 'file',
                         // 'max:10000', // Set a reasonable maximum file size (in kilobytes)
                         // 'mimes:mpga,wav,mp3',
-                    ],   
+                    ],
+                    'package_id' => 'nullable|array',
+                    'package_id.*' => 'exists:tbl_package,id'
                 ]);
             // }
             
@@ -136,10 +139,17 @@ class EBookController extends Controller
             $requestData['is_aiaudiobook'] = 1;
             $publisherId = Auth::guard('admin')->user()->id;
             $requestData['publisher_id'] = $publisherId;
-            // dd();
-            // exit;
+
             $ebook_data = EBook::updateOrCreate(['id' => $requestData['id']], $requestData);
             if(isset($ebook_data->id)){
+
+                if (!empty($requestData['package_id']) && is_array($requestData['package_id'])) {
+                    // Sync polymorphic many-to-many relation
+                    $ebook_data->subscriptions()->sync($requestData['package_id']);
+                } else {
+                    // Remove all package relations if none selected
+                    $ebook_data->subscriptions()->detach();
+                }
                 
                 // if($request->isAudioTab == 0){
                     $ebookFiles = $request->file('e-book');
@@ -277,6 +287,8 @@ class EBookController extends Controller
                 'artist_id' => 'required',
                 'category_id' => 'required',
                 'description' => 'required',
+                'package_id' => 'nullable|array',
+                'package_id.*' => 'exists:tbl_package,id'
             ];
 
 
@@ -285,7 +297,6 @@ class EBookController extends Controller
             }                
             
             $validator = Validator::make($request->all(), $validation_array);
-        
            
             if ($validator->fails()) {
                 $errs = $validator->errors()->all();
@@ -296,6 +307,7 @@ class EBookController extends Controller
                 $files = $requestData['image'];
                 $requestData['image'] = $this->common->saveImage($files, $this->folder);
             }
+
             $upload_file_name = '';
             if(isset($requestData['upload_file'])){
                 $document = $requestData['upload_file'];
@@ -310,6 +322,14 @@ class EBookController extends Controller
 
             $eBookData->update($requestData);
             if (isset($eBookData->id)) {
+                if (!empty($requestData['package_id']) && is_array($requestData['package_id'])) {
+                    // Sync polymorphic many-to-many relation
+                    $eBookData->subscriptions()->sync($requestData['package_id']);
+                } else {
+                    // Remove all package relations if none selected
+                    $eBookData->subscriptions()->detach();
+                }
+
                 if($request->isAudioTab == 0){
                     $ebookFiles = $request->file('e-book');
                     if(!empty($ebookFiles)){  

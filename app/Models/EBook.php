@@ -83,4 +83,9 @@ class EBook extends Model
             ? url('public/storage/e-books/' . $this->upload_file)
             : null;
     }
+
+    public function subscriptions()
+    {
+        return $this->morphToMany(Package::class, 'entity', 'subscription_entities');
+    }
 }

@@ -97,20 +97,39 @@
                             </div>
 
                             <div class="col-md-4 mb-3">
-                                <div class="form-group IS Paid">
-                                    <label for="download">{{__('label.IS Paid')}}</label>
-                                    <select class="form-control" name="is_paid">
-                                    <option value="0">{{__('label.free')}}</option>
-                                    <option value="1">{{__('label.paid')}}</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
                                 <div class="form-group Is_Download">
                                     <label for="download">{{__('label.Feature')}}</label>
                                     <select class="form-control" name="is_feature">
                                     <option value="0">{{__('label.no')}}</option>
                                     <option value="1">{{__('label.yes')}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <div class="form-group IS Paid">
+                                    <label for="download">IS Paid</label>
+                                    <select class="form-control" name="is_paid" id="is_paid">
+                                        <option value="0">{{__('label.free')}}</option>
+                                        <option value="1">{{__('label.paid')}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3" id="package_id_div">
+                                <div class="form-group">
+                                    <label for="download">Subscription Package</label>
+                                    @php
+                                        use App\Models\Package;
+                                        $packages = Package::all();
+                                    @endphp
+
+                                    <select class="form-control" name="package_id[]" multiple id="package_id">
+                                        @foreach($packages as $package)
+                                            <option value="{{ $package->id }}">
+                                                {{ $package->name ?? 'Unnamed Package' }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -174,63 +193,83 @@
 	<script>
         
         $(document).ready(function() {
-
+            $("#package_id").val([]);
+            $("#package_id_div").hide();
 
             $('#thumbnail').change(function(){
-            let reader = new FileReader();
-                reader.onload = (e) => { 
-                    $('#preview-image-before-upload').attr('src', e.target.result); 
-                }
-                reader.readAsDataURL(this.files[0]); 
+                let reader = new FileReader();
+                    reader.onload = (e) => { 
+                        $('#preview-image-before-upload').attr('src', e.target.result); 
+                    }
+                    reader.readAsDataURL(this.files[0]); 
+                });
+
+                $('#landscape').change(function() {
+                let reader = new FileReader();
+                    reader.onload = (e) => {
+                        $('#preview-image-before-upload1').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(this.files[0]);
             });
 
-            $('#landscape').change(function() {
-            let reader = new FileReader();
-                reader.onload = (e) => {
-                    $('#preview-image-before-upload1').attr('src', e.target.result);
-                }
-                reader.readAsDataURL(this.files[0]);
-        });
+            $(document).on('change', '#category_id', function() {
+                let category_id = $(this).val();
 
-        $(document).on('change', '#category_id', function() {
-            let category_id = $(this).val();
-
-            if (category_id) {
-                $.ajax({
-                    url: "{{ route('admin.get_category_subcategories') }}", // Use this in Blade view
-                    type: "POST",
-                    data: {
-                        id: category_id,
-                        _token: '{{ csrf_token() }}' // Add CSRF token for POST
-                    },
-                    success: function(response) {
-                        // Populate subcategory dropdown (example)
-                        let $subcat = $('#subcategory_id');
-                        $subcat.empty().append('<option value="">Select Subcategory</option>');
-                        if (response.status && response.data.length > 0) {
-                            $.each(response.data, function(index, subcat) {
-                                $subcat.append(`<option value="${subcat.id}">${subcat.name}</option>`);
-                            });
+                if (category_id) {
+                    $.ajax({
+                        url: "{{ route('admin.get_category_subcategories') }}", // Use this in Blade view
+                        type: "POST",
+                        data: {
+                            id: category_id,
+                            _token: '{{ csrf_token() }}' // Add CSRF token for POST
+                        },
+                        success: function(response) {
+                            // Populate subcategory dropdown (example)
+                            let $subcat = $('#subcategory_id');
+                            $subcat.empty().append('<option value="">Select Subcategory</option>');
+                            if (response.status && response.data.length > 0) {
+                                $.each(response.data, function(index, subcat) {
+                                    $subcat.append(`<option value="${subcat.id}">${subcat.name}</option>`);
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error("Error fetching subcategories:", xhr.responseText);
                         }
-                    },
-                    error: function(xhr) {
-                        console.error("Error fetching subcategories:", xhr.responseText);
+                    });
+                }
+            });
+
+            $("#type").change(function() {
+                $(this).find("option:selected").each(function() {
+                    var optionValue = $(this).attr("value");
+                    if (optionValue) {
+                        $(".box").not("." + optionValue).hide();
+                        $("." + optionValue).show();
+                    } else {
+                        $(".box").hide();
                     }
                 });
-            }
-        });
+            }).change();
 
-        $("#type").change(function() {
-            $(this).find("option:selected").each(function() {
-                var optionValue = $(this).attr("value");
-                if (optionValue) {
-                    $(".box").not("." + optionValue).hide();
-                    $("." + optionValue).show();
+            $('#package_id').select2({
+                placeholder: 'Select...',
+                allowClear: true,
+                width: '100%'
+            });
+            
+            $(document).on('change', '#is_paid', function() {
+                let is_paid = $(this).val();
+                console.log("is_paid : ", is_paid);
+
+                if (is_paid == 0) {
+                    $("#package_id").val([]);
+                    $("#package_id_div").hide();
                 } else {
-                    $(".box").hide();
+                    $("#package_id_div").show();
                 }
             });
-        }).change();
+            
         });
 		function save_video(){
 			$("#dvloader").show();
