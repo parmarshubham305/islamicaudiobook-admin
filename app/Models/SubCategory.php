@@ -35,7 +35,7 @@ class SubCategory extends Model
             return null;
         }
 
-        return url('public/storage/' . self::IMAGE_FOLDER . '/' . $this->image);
+        return url('storage/' . self::IMAGE_FOLDER . '/' . $this->image);
     }
 
     // Helper to delete an image file
