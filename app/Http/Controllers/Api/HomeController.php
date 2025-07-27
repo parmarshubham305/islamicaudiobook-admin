@@ -1164,7 +1164,7 @@ class HomeController extends Controller
                     'name' => 'required',
                 ],
                 [
-                    'name.required' => __('api_msg.Name Feild Requried'),
+                    'name.required' => __('Name Feild Requried'),
                 ]
             );
             if ($validation->fails()) {
@@ -1229,9 +1229,9 @@ class HomeController extends Controller
             }
 
             if (sizeof($data) > 0) {
-                return $this->common->API_Response(200, __('api_msg.video_record_get'), $data);
+                return $this->common->API_Response(200, __('Video record fetched successfully'), $data);
             } else {
-                return $this->common->API_Response(400, __('api_msg.data_not_found'));
+                return $this->common->API_Response(400, __('Data not found'));
             }
 
         }catch (Exception $e) {
@@ -5196,5 +5196,156 @@ class HomeController extends Controller
         } catch (Exception $e) {
             return response()->json(['status' => 400, 'errors' => $e->getMessage()]);
         }
-    }   
+    }
+
+    public function Search_filter_audio(Request $request)
+    {
+        $user_id = $request->user_id ?? 0;
+        $keyword = $request->keyword;
+        $page_limit = $request->page_limit ?? 10;
+
+        $data = Audio::with(['category', 'artist', 'user'])
+            ->where(function ($query) use ($keyword) {
+                $query->where('name', 'like', "%$keyword%")
+                    ->orWhereHas('artist', function ($q) use ($keyword) {
+                        $q->where('name', 'like', "%$keyword%");
+                    })
+                    ->orWhereHas('category', function ($q) use ($keyword) {
+                        $q->where('name', 'like', "%$keyword%");
+                    });
+            })
+            ->orderBy('id', 'desc');
+
+        // Pagination logic
+        $total_rows = $data->count();
+        $total_page = $page_limit;
+        $page_size = ceil($total_rows / $total_page);
+        $current_page = $request->page_no ?? 1;
+        $offset = $current_page * $total_page - $total_page;
+        $data->take($total_page)->offset($offset);
+
+        $more_page = $this->common->more_page($current_page, $page_size);
+
+        $data = $data->get()->toArray();
+
+        $pagination = $this->common->pagination_array($total_rows, $page_size, $current_page, $more_page);
+
+        $dataarray = [];
+        foreach ($data as $ra) {
+            $ra['audio'] = url('audio') . '/' . $ra['audio'];
+            $data1 = $this->common->get_all_count_for_video($ra['id'], $user_id, $ra['user_id']);
+            $ra = (object) array_merge((array) $ra, $data1);
+
+            $ra->is_like = "0";
+            if ($user_id != 0) {
+                $ra->is_like = $this->common->is_like($request['user_id'], $ra->id);
+            }
+
+            $ra->category_name = $ra->category['name'] ?? "";
+            $ra->artist_name = $ra->artist['name'] ?? "";
+
+            $ra->full_name = "";
+            $ra->user_name = "";
+            $ra->profile_img = asset('/assets/imgs/users.png');
+            if (isset($ra->user)) {
+                $ra->full_name = $ra->user['full_name'];
+                $ra->user_name = $ra->user['user_name'];
+                $ra->profile_img = $this->common->getImagePath($this->folder, $ra->user['image']);
+            }
+
+            // Purchase check for AI audio
+            $record_purchase = DB::select(
+                'SELECT is_purchased FROM tbl_aiaudio_transaction WHERE aiaudio_id = :aiaudio_id AND user_id = :user_id AND status = 1 AND is_purchased = 1',
+                [
+                    'aiaudio_id' => $ra->id,
+                    'user_id' => $user_id
+                ]
+            );
+
+            $ra->is_purchased = (!empty($record_purchase) || $ra->is_paid == 0) ? 1 : 0;
+
+            $dataarray[] = $ra;
+            unset($ra->category, $ra->user, $ra->artist);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => "Audio search result",
+            'data' => $dataarray,
+            'pagination' => $pagination
+        ]);
+    }
+
+    public function searchEbookList(Request $request) {
+        try {
+            $user_id = isset($request['user_id']) ? $request['user_id'] : 0;
+            $current_page = $request->page_no ?? 1;
+            $keyword = $request->keyword ?? '';
+
+            $page_size = 0;
+            $more_page = false;
+            $page_limit = env('PAGE_LIMIT');
+
+            $data = EBook::with('category', 'artist', 'user', 'multipleEbooks')
+                        ->when($keyword, function ($q) use ($keyword) {
+                            $q->where('name', 'like', "%$keyword%")
+                                ->orWhereHas('artist', function ($q) use ($keyword) {
+                                    $q->where('name', 'like', "%$keyword%");
+                                })
+                                ->orWhereHas('category', function ($q) use ($keyword) {
+                                    $q->where('name', 'like', "%$keyword%");
+                                });
+                        })
+                        ->latest();
+
+            $total_rows = $data->count();
+            $total_page = $page_limit;
+            $page_size = ceil($total_rows / $total_page);
+            $offset = $current_page * $total_page - $total_page;
+
+            $data->take($total_page)->offset($offset);
+            $more_page = $this->common->more_page($current_page, $page_size);
+
+            $data = $data->get()->toArray();
+            $pagination = $this->common->pagination_array($total_rows, $page_size, $current_page, $more_page);
+
+            $dataarray = [];
+            foreach ($data as $ra) {
+                $ra['file_url'] = url('storage/documents/' . $ra['upload_file']);
+                $data1 = $this->common->get_all_count_for_ebook($ra['id'], $user_id, $ra['user_id']);
+                $ra = (object) array_merge((array) $ra, $data1);
+
+                $ra->image = $this->common->getImagePath($this->folder_ebook, $ra->image);
+                $ra->category_name = $ra->category['name'] ?? "";
+                $ra->author_name = $ra->author['name'] ?? "";
+                $ra->full_name = $ra->user['full_name'] ?? "";
+                $ra->user_name = $ra->user['user_name'] ?? "";
+                $ra->profile_img = isset($ra->user) ? $this->common->getImagePath($this->folder, $ra->user['image']) : asset('/assets/imgs/users.png');
+
+                $record_purchase = DB::select(
+                    'select is_purchased from tbl_ebook_transaction where ebook_id = :ebook_id and user_id = :user_id and status = :status and is_purchased = :is_purchased',
+                    [
+                        'ebook_id' => $ra->id,
+                        'user_id' => $user_id,
+                        'status' => 1,
+                        'is_purchased' => 1
+                    ]
+                );
+
+                if (!empty($record_purchase) || $ra->is_paid == 0) {
+                    $ra->is_purchased = 1;
+                } else {
+                    $ra->is_purchased = 0;
+                }
+
+                $dataarray[] = $ra;
+                unset($ra->category, $ra->user, $ra->author);
+            }
+
+            return $this->common->API_Response(200, 'Searched E-Book list retrieved successfully', $dataarray, $pagination);
+
+        } catch (Exception $e) {
+            return response()->json(['status' => 400, 'errors' => $e->getMessage()]);
+        }
+    }
 }
