@@ -325,6 +325,14 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="form-row">
+                                                <div class="col-md-12"> 
+                                                    <!-- Button trigger modal -->
+                                                    <button type="button" class="btn btn-primary open-smart-collection-selection">
+                                                        Launch Demo Modal
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>            
@@ -337,6 +345,55 @@
                                 <input type="hidden" name="_method" value="PATCH">
                             </div>
                         </form>
+                    </div>
+                </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="smartCollectionSelectionModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                        
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Assign Audio TO Smart Collection</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            
+                            <div class="modal-body" style="max-height: 300px; overflow-y: auto;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="smart_collection" id="radio1" value="option1">
+                                    <label class="form-check-label" for="radio1">Option 1</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="smart_collection" id="radio2" value="option2">
+                                    <label class="form-check-label" for="radio2">Option 2</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="smart_collection" id="radio3" value="option3">
+                                    <label class="form-check-label" for="radio3">Option 3</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="smart_collection" id="radio4" value="option4">
+                                    <label class="form-check-label" for="radio4">Option 4</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="smart_collection" id="radio5" value="option5">
+                                    <label class="form-check-label" for="radio5">Option 5</label>
+                                </div>
+                            </div>
+
+                            
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                            </div>
+                        
+                        </div>
                     </div>
                 </div>
     
@@ -534,6 +591,11 @@
                     }
                 });
                 $('#confirmDeleteModal').modal('hide');
+            });
+
+
+            $(".open-smart-collection-selection").click(function() {
+                console.log("Hello World");
             });
         });
 		

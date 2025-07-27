@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\SubCategory;
 use App\Models\Common;
 use App\Models\Video;
 use DataTables;
@@ -15,7 +16,7 @@ use Validator;
 class CategoryController extends Controller
 {
     
-    private $folder = "category";
+    private $folder = Category::IMAGE_FOLDER;
     public $common;
 
     public function __construct()
@@ -112,7 +113,7 @@ class CategoryController extends Controller
     public function edit($id)
     {
         try {
-            $params['data'] = Category::where('id', $id)->first();
+            $params['data'] = Category::with(['subcategories'])->where('id', $id)->first();
 
             $this->common->imageNameToUrl(array($params['data']), 'image', $this->folder);
 
@@ -184,6 +185,79 @@ class CategoryController extends Controller
 
         }catch (Exception $e) {
             return response()->json(array('status' => 400, 'errors' => $e->getMessage()));
+        }
+    }
+
+    public function createSubCategory(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'category_id' => 'required|exists:tbl_category,id',
+                'name'        => 'required|min:2',
+                'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 400,
+                    'errors' => $validator->errors()->all()
+                ]);
+            }
+
+            $requestData = $request->only(['category_id', 'name', 'image']);
+            $requestData['status'] = 1;
+
+            // Image upload (if exists)
+            if ($request->hasFile('image')) {
+                $imageFile = $request->file('image');
+                $requestData['image'] = $this->common->saveImage($imageFile, $this->folder);
+            }
+
+            $subcategory = SubCategory::updateOrCreate(
+                ['id' => $request->id ?? null],
+                $requestData
+            );
+
+            if ($subcategory->id) {
+                return response()->json([
+                    'status' => 200,
+                    'success' => 'Subcategory saved successfully.'
+                ]);
+            }
+
+            return response()->json([
+                'status' => 400,
+                'errors' => ['Failed to save subcategory.']
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 400,
+                'errors' => [$e->getMessage()]
+            ]);
+        }
+    }
+
+    public function deleteSubCategory(Request $request)
+    {
+        // Validate the incoming request
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:tbl_sub_categories,id',
+        ]);
+
+        try {
+            $subcategory = Subcategory::findOrFail($validated['id']);
+            $subcategory->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Subcategory deleted successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to delete subcategory.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 }

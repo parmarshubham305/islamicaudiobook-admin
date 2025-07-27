@@ -165,3 +165,6 @@ Route::post('custom_package/create', [HomeController::class, 'createCustomPackag
 
 // Route to confirm payment and activate the custom package
 Route::post('custom_package/confirm_payment', [HomeController::class, 'confirmPackagePayment'])->name('custom_package_confirm_payment');
+
+
+Route::post('audio_books_list', [HomeController::class, 'audio_books_list'])->name('audio_books_list');

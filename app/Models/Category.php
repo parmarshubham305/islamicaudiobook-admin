@@ -18,4 +18,11 @@ class Category extends Model
     protected $casts = [
         'status' => 'integer',
     ];
+
+    public const IMAGE_FOLDER = 'category';
+
+    public function subcategories()
+    {
+        return $this->hasMany(SubCategory::class, 'category_id');
+    }
 }
