@@ -226,7 +226,7 @@ class HomeController extends Controller
             $more_page = false;
             $page_limit = env('PAGE_LIMIT');
 
-            $data = Category::orderBy('id','DESC');  
+            $data = Category::with(['subcategories'])->orderBy('id','DESC');  
 
             $total_rows = $data->count();
             $total_page = $page_limit;
