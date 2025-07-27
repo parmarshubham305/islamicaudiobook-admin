@@ -5110,7 +5110,7 @@ class HomeController extends Controller
                 unset($ra->category, $ra->user, $ra->artist);
             }
 
-            return $this->common->API_Response(200, 'AI Audio book list get succcesfully', $dataarray, $pagination);
+            return $this->common->API_Response(200, 'Audio book trending list get succcesfully', $dataarray, $pagination);
 
         }catch (Exception $e) {
             return response()->json(array('status' => 400, 'errors' => $e->getMessage()));
@@ -5190,7 +5190,7 @@ class HomeController extends Controller
                     unset($ra->category, $ra->user, $ra->author);
                 }
     
-                return $this->common->API_Response(200, 'E-Book list retrieved successfully', $dataarray, $pagination);
+                return $this->common->API_Response(200, 'E-Book trending list retrieved successfully', $dataarray, $pagination);
             // });
     
         } catch (Exception $e) {
