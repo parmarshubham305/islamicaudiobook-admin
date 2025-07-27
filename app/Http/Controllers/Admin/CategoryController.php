@@ -260,4 +260,30 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
+    public function getCategorySubcategories(Request $request)
+    {
+        // Validate the incoming request
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:tbl_category,id',
+        ]);
+
+        try {
+            // Retrieve category with subcategories
+            $category = Category::with('subcategories')
+                ->where('id', $validated['id'])
+                ->first();
+
+            return response()->json([
+                'status' => true,
+                'data' => $category->subcategories,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch subcategories.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

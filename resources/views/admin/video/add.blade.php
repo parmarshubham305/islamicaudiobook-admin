@@ -86,6 +86,16 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <div class="col-md-4 mb-3">
+                                <div class="form-group">
+                                    <label for="subcategory_id">Subcategory</label>
+                                    <select class="form-control" style="width:100%!important;" name="subcategory_id" id="subcategory_id">
+                                        <option value="">Select Subcategory</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="col-md-4 mb-3">
                                 <div class="form-group IS Paid">
                                     <label for="download">{{__('label.IS Paid')}}</label>
@@ -215,6 +225,35 @@
             });
         }).change();
         });
+
+        $(document).on('change', '#category_id', function() {
+            let category_id = $(this).val();
+
+            if (category_id) {
+                $.ajax({
+                    url: "{{ route('admin.get_category_subcategories') }}", // Use this in Blade view
+                    type: "POST",
+                    data: {
+                        id: category_id,
+                        _token: '{{ csrf_token() }}' // Add CSRF token for POST
+                    },
+                    success: function(response) {
+                        // Populate subcategory dropdown (example)
+                        let $subcat = $('#subcategory_id');
+                        $subcat.empty().append('<option value="">Select Subcategory</option>');
+                        if (response.status && response.data.length > 0) {
+                            $.each(response.data, function(index, subcat) {
+                                $subcat.append(`<option value="${subcat.id}">${subcat.name}</option>`);
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error("Error fetching subcategories:", xhr.responseText);
+                    }
+                });
+            }
+        });
+        
 		function save_video(){
 			$("#dvloader").show();
 			var formData = new FormData($("#video")[0]);

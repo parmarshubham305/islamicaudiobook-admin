@@ -77,6 +77,7 @@ Route::group(['prefix' => 'admin','middleware' => 'adminauth'], function()  {
         Route::resource('category', CategoryController::class)->only(['create', 'store', 'edit', 'update', 'destroy']);
         Route::post('create-subcategory', [CategoryController::class, 'createSubCategory'])->name('admin.create_subcategory');
         Route::post('delete-subcategory', [CategoryController::class, 'deleteSubCategory'])->name('admin.delete_subcategory');
+        Route::post('get-category-subcategories', [CategoryController::class, 'getCategorySubcategories'])->name('admin.get_category_subcategories');
         // Video //
         Route::resource('video', VideoController::class)->only(['create', 'store', 'edit', 'update', 'show', 'destroy']);
         Route::post('/video/approve', [VideoController::class, 'approvevideo'])->name('video.approvevideo');

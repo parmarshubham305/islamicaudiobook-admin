@@ -92,6 +92,7 @@ class EBookController extends Controller
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
+                    'subcategory_id' => 'nullable|integer',
                     'description' => 'required',    
                     'e-book' => [
                         'required',

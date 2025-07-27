@@ -59,6 +59,10 @@
                             </td>
                         </tr>
                         <tr>
+                            <td>Subcategory</td>
+                            <td>{{ optional($detail->subcategory)->name ?? '-' }}</td>
+                        </tr>
+                        <tr>
                             <td>{{__('label.image')}}</td>
                             <td>
                                 <img src="{{ $detail->image }}" class="img-thumbnail" height="100px" width="100px">

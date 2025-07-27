@@ -13,7 +13,7 @@ class Audio extends Model
 
     protected $guarded = array();
 
-    protected $fillable = ['name','category_id','user_id','publisher_id','artist_id','video_type','url','download','description','is_feature','is_paid','v_view','image','audio','is_aiaudiobook','price','is_approved','isAudioTab','audio_content','is_created_by_admin','upload_file'];
+    protected $fillable = ['name','category_id','subcategory_id','user_id','publisher_id','artist_id','video_type','url','download','description','is_feature','is_paid','v_view','image','audio','is_aiaudiobook','price','is_approved','isAudioTab','audio_content','is_created_by_admin','upload_file'];
 
     protected $casts = [
         'is_feature' => 'integer',
@@ -28,6 +28,12 @@ class Audio extends Model
     {
         return $this->belongsTo(Category::class,'category_id');
     }
+
+    public function subcategory()
+    {
+        return $this->belongsTo(SubCategory::class,'subcategory_id');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class,'user_id');

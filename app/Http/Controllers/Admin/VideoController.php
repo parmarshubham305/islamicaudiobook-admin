@@ -75,6 +75,7 @@ class VideoController extends Controller
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
+                    'subcategory_id' => 'nullable|integer',
                     'mp3_file_name' => 'required',
                     'description' => 'required',
                     'image' => 'required',
@@ -85,6 +86,7 @@ class VideoController extends Controller
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
+                    'subcategory_id' => 'nullable|integer',
                     'url' => 'required',
                     'description' => 'required',
                     'image' => 'required',
@@ -203,6 +205,7 @@ class VideoController extends Controller
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
+                    'subcategory_id' => 'nullable|integer',
                     'description' => 'required',
                 ]);
             } else {
@@ -210,6 +213,7 @@ class VideoController extends Controller
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
+                    'subcategory_id' => 'nullable|integer',
                     'url' => 'required',
                     'description' => 'required',
                 ]);

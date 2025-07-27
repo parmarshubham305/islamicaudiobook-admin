@@ -16,6 +16,7 @@ class EBook extends Model
         'publisher_id',
         'user_id',
         'category_id',
+        'subcategory_id',
         'file_type',
         'url',
         'is_feature',
@@ -43,6 +44,10 @@ class EBook extends Model
     public function category()
     {
         return $this->belongsTo(Category::class,'category_id');
+    }
+    public function subcategory()
+    {
+        return $this->belongsTo(SubCategory::class,'subcategory_id');
     }
     public function user()
     {

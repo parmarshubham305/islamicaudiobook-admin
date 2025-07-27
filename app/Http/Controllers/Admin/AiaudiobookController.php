@@ -75,6 +75,7 @@ class AiaudiobookController extends Controller
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
+                    'subcategory_id' => 'nullable|integer',
                     'description' => 'required',    
                     'audio' => 'required',   
                 ]);
@@ -83,6 +84,7 @@ class AiaudiobookController extends Controller
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
+                    'subcategory_id' => 'nullable|integer',
                     'description' => 'required',    
                     'audio' => [
                         'required',
@@ -202,6 +204,7 @@ class AiaudiobookController extends Controller
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
+                    'subcategory_id' => 'nullable|integer',
                     'description' => 'required',
                 ];
                 
@@ -214,6 +217,7 @@ class AiaudiobookController extends Controller
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
+                    'subcategory_id' => 'nullable|integer',
                     'description' => 'required',
                     'audio' => 'required',
                 ]);
@@ -325,8 +329,9 @@ class AiaudiobookController extends Controller
 
     public function detail(Request $request,$id)
     {
+        // dd("test");
         try{
-            $detail =Audio::where('id',$id)->where('is_aiaudiobook', '!=', 0)->first();
+            $detail =Audio::with(['subcategory'])->where('id',$id)->where('is_aiaudiobook', '!=', 0)->first();
 
             $category =Category::where('id',$detail->category_id)->first();
             $artist=Artist::where('id',$detail->artist_id)->first();
