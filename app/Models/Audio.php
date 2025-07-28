@@ -55,7 +55,7 @@ class Audio extends Model
     public function getImageUrlAttribute()
     {
         return $this->image
-            ? url('public/storage/audio/' . $this->image)
+            ? url('storage/audio/' . $this->image)
             : asset('assets/imgs/default-image.png');
     }
 
