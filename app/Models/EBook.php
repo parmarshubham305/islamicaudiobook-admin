@@ -70,7 +70,7 @@ class EBook extends Model
     public function getImageUrlAttribute()
     {
         return $this->image
-            ? url('public/storage/e-books/' . $this->image)
+            ? url('storage/e-books/' . $this->image)
             : asset('assets/imgs/no_img.png');
     }
 
@@ -80,7 +80,7 @@ class EBook extends Model
     public function getFileUrlAttribute()
     {
         return $this->upload_file
-            ? url('public/storage/e-books/' . $this->upload_file)
+            ? url('storage/e-books/' . $this->upload_file)
             : null;
     }
 
