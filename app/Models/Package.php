@@ -19,6 +19,8 @@ class Package extends Model
         'status' => 'integer',
     ];
 
+    protected $appends = ['image_url'];
+
     public function entities()
     {
         return $this->morphedByMany(Audio::class, 'entity', 'subscription_entities')
@@ -47,5 +49,15 @@ class Package extends Model
             ->merge($this->audios)
             ->merge($this->videos)
             ->merge($this->ebooks);
+    }
+
+    /**
+     * Get full image URL or default placeholder.
+     */
+    public function getImageUrlAttribute()
+    {
+        return $this->image
+            ? url('storage/package/' . $this->image)
+            : asset('assets/imgs/default-image.png');
     }
 }
