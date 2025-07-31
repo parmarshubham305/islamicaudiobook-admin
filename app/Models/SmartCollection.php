@@ -32,7 +32,7 @@ class SmartCollection extends Model
     {
         return $this->image
             ? url('storage/smart-collection/' . $this->image)
-            : asset('assets/imgs/default-image.png');
+            : asset('assets/imgs/no_img.png');
     }
 
     public function customPackages()

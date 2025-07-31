@@ -71,7 +71,7 @@ class EBook extends Model
     {
         return $this->image
             ? url('public/storage/e-books/' . $this->image)
-            : asset('assets/imgs/default-image.png');
+            : asset('assets/imgs/no_img.png');
     }
 
     /**

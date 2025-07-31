@@ -58,6 +58,6 @@ class Package extends Model
     {
         return $this->image
             ? url('storage/package/' . $this->image)
-            : asset('assets/imgs/default-image.png');
+            : asset('assets/imgs/no_img.png');
     }
 }
