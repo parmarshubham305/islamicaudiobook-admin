@@ -988,6 +988,24 @@ class RatingController extends Controller
                             $ra->is_purchased = 0;
                         }
                     }
+
+                    if($type == 'ebook'){
+                        $record_purchase = DB::select(
+                            'select is_purchased from tbl_ebook_transaction where ebook_id = :ebook_id and user_id = :user_id and status = :status and is_purchased = :is_purchased',
+                            [
+                                'ebook_id' => $ra->id,
+                                'user_id' => $user_id,
+                                'status' => 1,
+                                'is_purchased' => 1
+                            ]
+                        );
+
+                        if (!empty($record_purchase) || $ra->is_paid == 0) {
+                            $ra->is_purchased = 1;
+                        } else{
+                            $ra->is_purchased = 0;
+                        }   
+                    }
     
                     $dataarray[] = $ra;
                     unset($ra->category, $ra->user, $ra->artist);
