@@ -4539,7 +4539,6 @@ class HomeController extends Controller
             }
 
             $ra = $ebook->toArray();
-            $ra['file_url'] = url('public/storage/e-book/' . $ra['upload_file']);
 
             $data1 = $this->common->get_all_count_for_ebook($ra['id'], $user_id, $ra['user_id']);
             $ra = (object) array_merge($ra, $data1);
