@@ -7,6 +7,9 @@ use Config;
 
 use App\Models\Common;
 use App\Models\User;
+use App\Models\EBook;
+use App\Models\Video;
+use App\Models\Audio;
 use Illuminate\Http\Request;
 use App\Models\Smtp;
 use Validator;
@@ -426,6 +429,9 @@ class UserController extends Controller
                 $user_data['image'] = $path;
 
                 $user_data['subscriptions'] = $this->common->getUserAllPlansWithBuyStatus($user_id);
+                $user_data['subscription_ebooks'] = EBook::where('is_paid', '1')->get();
+                $user_data['subscription_audios'] = Audio::where('is_paid', '1')->get();
+                $user_data['subscription_videos'] = Video::where('is_paid', '1')->get();
 
                 return $this->common->API_Response(200, __('api_msg.user_record_get'), array($user_data));
             } else{
