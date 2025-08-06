@@ -282,7 +282,7 @@ class Common extends Model
     }
 
     public function getUserAllPlansWithBuyStatus($userId) {
-        $packages = Package::get();
+        $packages = Package::with(['audios', 'videos', 'ebooks'])->get();
         $subscriptionsData = [];
     
         foreach ($packages as $package) {
