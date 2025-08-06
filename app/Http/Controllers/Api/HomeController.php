@@ -5039,7 +5039,7 @@ class HomeController extends Controller
                         ->from('tbl_view')
                         ->where('status', '1')
                         ->whereIn('type', ['audio', 'aiaudio'])
-                        ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                        // ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                         ->groupBy('video_id')
                         ->orderByRaw('COUNT(*) DESC');
                 });
@@ -5141,7 +5141,7 @@ class HomeController extends Controller
                             ->from('tbl_view')
                             ->where('status', '1')
                             ->whereIn('type', ['ebook'])
-                            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                            // ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                             ->groupBy('video_id')
                             ->orderByRaw('COUNT(*) DESC');
                     });
