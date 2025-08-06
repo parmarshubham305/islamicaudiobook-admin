@@ -428,10 +428,92 @@ class UserController extends Controller
                 $path = $this->common->getImagePath($this->folder, $user_data['image']);
                 $user_data['image'] = $path;
 
-                $user_data['subscriptions'] = $this->common->getUserAllPlansWithBuyStatus($user_id);
+                $userSubscriptions = $this->common->getUserAllPlansWithBuyStatus($user_id);
+                
+                $user_data['subscriptions'] = $userSubscriptions;
                 $user_data['subscription_ebooks'] = EBook::where('is_paid', '1')->get();
                 $user_data['subscription_audios'] = Audio::where('is_paid', '1')->get();
                 $user_data['subscription_videos'] = Video::where('is_paid', '1')->get();
+
+                // Start User purchased Ebooks
+                $individualPurchaseebooks = EBook::select('tbl_ebooks.*')
+                    ->join('tbl_ebook_transaction', 'tbl_ebooks.id', '=', 'tbl_ebook_transaction.ebook_id')
+                    ->where('tbl_ebook_transaction.user_id', $user_id)
+                    ->distinct()
+                    ->get()
+                    ->toArray();
+
+                $allSubscriptionEbooks = [];
+                
+                foreach ($userSubscriptions as $subscription) {
+                    foreach ($subscription['ebooks'] as $ebook) {
+                        $allSubscriptionEbooks[] = $ebook;
+                    }
+                }
+
+                foreach ($individualPurchaseebooks as $ebook) {
+                    $allSubscriptionEbooks[] = $ebook;
+                }
+
+                $allSubscriptionEbooks = collect($allSubscriptionEbooks)
+                ->unique('id')       // keep first occurrence of each unique `id`
+                ->values(); 
+                // End User purchased Ebooks
+
+                // Start User purchased Audios
+                $individualPurchaseAudios = Audio::select('tbl_audio.*')
+                    ->join('tbl_aiaudio_transaction', 'tbl_audio.id', '=', 'tbl_aiaudio_transaction.aiaudio_id')
+                    ->where('tbl_aiaudio_transaction.user_id', $user_id)
+                    ->distinct()
+                    ->get()
+                    ->toArray();
+
+                $allSubscriptionAudios = [];
+                
+                foreach ($userSubscriptions as $subscription) {
+                    foreach ($subscription['audios'] as $audio) {
+                        $allSubscriptionAudios[] = $audio;
+                    }
+                }
+
+                foreach ($individualPurchaseAudios as $audio) {
+                    $allSubscriptionAudios[] = $audio;
+                }
+
+                $allSubscriptionAudios = collect($allSubscriptionAudios)
+                ->unique('id')       // keep first occurrence of each unique `id`
+                ->values(); 
+                // End User purchased Audios
+
+                // Start User purchased Videos
+                // $individualPurchaseVideo = Video::select('tbl_video.*')
+                //     ->join('tbl_aiaudio_transaction', 'tbl_video.id', '=', 'tbl_aiaudio_transaction.aiaudio_id')
+                //     ->where('tbl_aiaudio_transaction.user_id', $user_id)
+                //     ->distinct()
+                //     ->get()
+                //     ->toArray();
+
+                // $allSubscriptionVideo = [];
+                
+                // foreach ($userSubscriptions as $subscription) {
+                //     foreach ($subscription['videos'] as $audio) {
+                //         $allSubscriptionVideo[] = $audio;
+                //     }
+                // }
+
+                // foreach ($individualPurchaseVideo as $audio) {
+                //     $allSubscriptionVideo[] = $audio;
+                // }
+
+                // $allSubscriptionVideo = collect($allSubscriptionVideo)
+                // ->unique('id')       // keep first occurrence of each unique `id`
+                // ->values(); 
+                // End User purchased Videos
+
+
+                $user_data['all_purchase_ebooks'] = $allSubscriptionEbooks;
+                $user_data['all_purchase_audios'] = $allSubscriptionAudios;
+                // $user_data['all_purchase_videos'] = [];
 
                 return $this->common->API_Response(200, __('api_msg.user_record_get'), array($user_data));
             } else{
