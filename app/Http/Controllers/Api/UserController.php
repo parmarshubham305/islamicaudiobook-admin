@@ -16,7 +16,7 @@ use Validator;
 use Storage;
 use App\Exceptions\Handler;
 use App\Mail\Subscribe;
-
+use Illuminate\Support\Facades\DB;
 use App\Helpers\AppHelper;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -429,8 +429,61 @@ class UserController extends Controller
                 $user_data['image'] = $path;
 
                 $userSubscriptions = $this->common->getUserAllPlansWithBuyStatus($user_id);
+
+                $userSubscriptionsNew = [];
+
+                foreach ($userSubscriptions as $sub) {
+                    $sub_audios_old = $sub['audios'];
+                    $sub_ebooks_old = $sub['ebooks'];
+
+                    $sub['audios'] = [];
+                    $sub['ebooks'] = [];
+
+                    foreach ($sub_audios_old as $ra) {
+                        $record_purchase = DB::select(
+                            'select is_purchased from tbl_aiaudio_transaction where aiaudio_id = :aiaudio_id and user_id = :user_id and status = :status and is_purchased = :is_purchased',
+                            [
+                                'aiaudio_id' => $ra['id'],
+                                'user_id' => $user_id,
+                                'status' => 1,
+                                'is_purchased' => 1
+                            ]
+                        );
+
+                        if (!empty($record_purchase) || $ra['is_paid'] == 0) {
+                            $ra['is_purchased'] = 1;
+                        } else{
+                            $ra['is_purchased'] = 0;
+                        }
+
+                        $sub['audios'][] = $ra;
+                    }
+
+                    foreach ($sub_ebooks_old as $ra) {
+                        $record_purchase = DB::select(
+                            'select is_purchased from tbl_aiaudio_transaction where aiaudio_id = :aiaudio_id and user_id = :user_id and status = :status and is_purchased = :is_purchased',
+                            [
+                                'aiaudio_id' => $ra['id'],
+                                'user_id' => $user_id,
+                                'status' => 1,
+                                'is_purchased' => 1
+                            ]
+                        );
+
+                        if (!empty($record_purchase) || $ra['is_paid'] == 0) {
+                            $ra['is_purchased'] = 1;
+                        } else{
+                            $ra['is_purchased'] = 0;
+                        }
+
+                        $sub['ebooks'][] = $ra;
+                    }
+
+                    $userSubscriptionsNew[] = $sub;
+                }
+
                 
-                $user_data['subscriptions'] = $userSubscriptions;
+                $user_data['subscriptions'] = $userSubscriptionsNew;
                 $user_data['subscription_ebooks'] = EBook::where('is_paid', '1')->get();
                 $user_data['subscription_audios'] = Audio::where('is_paid', '1')->get();
                 $user_data['subscription_videos'] = Video::where('is_paid', '1')->get();
@@ -510,9 +563,50 @@ class UserController extends Controller
                 // ->values(); 
                 // End User purchased Videos
 
+                $allSubscriptionEbooksNew = [];
+                foreach ($allSubscriptionEbooks as $ra) {
+                    $record_purchase = DB::select(
+                        'select is_purchased from tbl_ebook_transaction where ebook_id = :ebook_id and user_id = :user_id and status = :status and is_purchased = :is_purchased',
+                        [
+                            'ebook_id' => $ra['id'],
+                            'user_id' => $user_id,
+                            'status' => 1,
+                            'is_purchased' => 1
+                        ]
+                    );
 
-                $user_data['all_purchase_ebooks'] = $allSubscriptionEbooks;
-                $user_data['all_purchase_audios'] = $allSubscriptionAudios;
+                    if (!empty($record_purchase) || $ra['is_paid'] == 0) {
+                        $ra['is_purchased'] = 1;
+                    } else{
+                        $ra['is_purchased'] = 0;
+                    }
+
+                    $allSubscriptionEbooksNew[] = $ra;
+                }
+
+                $allSubscriptionAudiosNew = [];
+                foreach ($allSubscriptionEbooks as $ra) {
+                    $record_purchase = DB::select(
+                        'select is_purchased from tbl_aiaudio_transaction where aiaudio_id = :aiaudio_id and user_id = :user_id and status = :status and is_purchased = :is_purchased',
+                        [
+                            'aiaudio_id' => $ra['id'],
+                            'user_id' => $user_id,
+                            'status' => 1,
+                            'is_purchased' => 1
+                        ]
+                    );
+
+                    if (!empty($record_purchase) || $ra['is_paid'] == 0) {
+                        $ra['is_purchased'] = 1;
+                    } else{
+                        $ra['is_purchased'] = 0;
+                    }
+
+                    $allSubscriptionAudiosNew[] = $ra;
+                }
+
+                $user_data['all_purchase_ebooks'] = $allSubscriptionEbooksNew;
+                $user_data['all_purchase_audios'] = $allSubscriptionAudiosNew;
                 // $user_data['all_purchase_videos'] = [];
 
                 return $this->common->API_Response(200, __('api_msg.user_record_get'), array($user_data));
