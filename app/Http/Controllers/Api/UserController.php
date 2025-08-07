@@ -585,7 +585,7 @@ class UserController extends Controller
                 }
 
                 $allSubscriptionAudiosNew = [];
-                foreach ($allSubscriptionEbooks as $ra) {
+                foreach ($allSubscriptionAudios as $ra) {
                     $record_purchase = DB::select(
                         'select is_purchased from tbl_aiaudio_transaction where aiaudio_id = :aiaudio_id and user_id = :user_id and status = :status and is_purchased = :is_purchased',
                         [
