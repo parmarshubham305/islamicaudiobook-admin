@@ -243,8 +243,6 @@ class HomeController extends Controller
 
             $pagination = $this->common->pagination_array($total_rows, $page_size, $current_page, $more_page);
 
-                // Image Name to URL
-                $this->common->imageNameToUrl($data, 'image', $this->folder2);
 
                 return $this->common->API_Response(200, __('api_msg.category_record_get'), $data, $pagination);
 
