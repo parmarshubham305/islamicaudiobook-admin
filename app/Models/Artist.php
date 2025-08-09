@@ -19,5 +19,17 @@ class Artist extends Model
         'status' => 'integer',
     ];
 
+    protected $appends = ['image_url'];
+
+    /**
+     * Get full image URL or default placeholder.
+     */
+    public function getImageUrlAttribute()
+    {
+        return $this->image
+            ? url('storage/artist/' . $this->image)
+            : asset('assets/imgs/no_img.png');
+    }
+
     
 }
