@@ -711,13 +711,13 @@ class RatingController extends Controller
 
                 $Ids = explode(',', $video_ids);
                 if($type == 'video'){
-                    $data = Video::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with('category')->orderBy('created_at', 'desc');
+                    $data = Video::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with(['category', 'artist'])->orderBy('created_at', 'desc');
                 }if($type == 'ebook'){
-                    $data = EBook::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with('category')->orderBy('created_at', 'desc');
+                    $data = EBook::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with(['category', 'artist'])->orderBy('created_at', 'desc');
                 }else if($type == 'aiaudio'){
-                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"1")->with('category')->orderBy('created_at', 'desc');
+                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"1")->with(['category', 'artist'])->orderBy('created_at', 'desc');
                 }else{
-                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"0")->with('category')->orderBy('created_at', 'desc');
+                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"0")->with(['category', 'artist'])->orderBy('created_at', 'desc');
                 }
                 
 
@@ -909,13 +909,13 @@ class RatingController extends Controller
 
                 $Ids = explode(',', $video_ids);
                 if($type == 'video'){
-                    $data = Video::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with('category')->orderBy('created_at', 'desc');
+                    $data = Video::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with(['category', 'artist'])->orderBy('created_at', 'desc');
                 }if($type == 'ebook'){
-                    $data = EBook::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with('category')->orderBy('created_at', 'desc');
+                    $data = EBook::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with(['category', 'artist'])->orderBy('created_at', 'desc');
                 }else if($type == 'aiaudio'){
-                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"1")->with('category')->orderBy('created_at', 'desc');
+                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"1")->with(['category', 'artist'])->orderBy('created_at', 'desc');
                 }else{
-                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"0")->with('category')->orderBy('created_at', 'desc');
+                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"0")->with(['category', 'artist'])->orderBy('created_at', 'desc');
                 }
                 
 

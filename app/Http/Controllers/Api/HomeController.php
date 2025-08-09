@@ -5162,7 +5162,7 @@ class HomeController extends Controller
 
                     $ra->image = $this->common->getImagePath($this->folder_ebook, $ra->image);
                     $ra->category_name = $ra->category['name'] ?? "";
-                    $ra->author_name = $ra->author['name'] ?? "";
+                    $ra->author_name = $ra->artist['name'] ?? "";
                     $ra->full_name = $ra->user['full_name'] ?? "";
                     $ra->user_name = $ra->user['user_name'] ?? "";
                     $ra->profile_img = isset($ra->user) ? $this->common->getImagePath($this->folder, $ra->user['image']) : asset('/assets/imgs/users.png');
@@ -5314,7 +5314,7 @@ class HomeController extends Controller
 
                 $ra->image = $this->common->getImagePath($this->folder_ebook, $ra->image);
                 $ra->category_name = $ra->category['name'] ?? "";
-                $ra->author_name = $ra->author['name'] ?? "";
+                $ra->author_name = $ra->artist['name'] ?? "";
                 $ra->full_name = $ra->user['full_name'] ?? "";
                 $ra->user_name = $ra->user['user_name'] ?? "";
                 $ra->profile_img = isset($ra->user) ? $this->common->getImagePath($this->folder, $ra->user['image']) : asset('/assets/imgs/users.png');
