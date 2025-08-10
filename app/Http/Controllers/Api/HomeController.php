@@ -3037,7 +3037,7 @@ class HomeController extends Controller
             $video_id =$request['video_id'];
             $user_id = isset($request->user_id) ? $request->user_id : 0;
 
-            $data = Audio::where('id',$video_id)->where('is_aiaudiobook',"1")->with('user','category','artist')->first();
+            $data = Audio::where('id',$video_id)->with('user','category','artist')->first();
             
             if ($data) {
                 $ra = $data->toArray();
