@@ -1675,7 +1675,7 @@ class HomeController extends Controller
             $payment_id = isset($request->payment_id) ? $request->payment_id : "";
             $currency_code = isset($request->currency_code) ? $request->currency_code : currency_code();
 
-            $Pdata = Audio::where('id',$aiAudio_id)->where('is_approved','1')->where('is_paid',"1")->where('is_aiaudiobook',1)->first();
+            $Pdata = Audio::where('id',$aiAudio_id)->where('is_approved','1')->where('is_paid',"1")->first();
             if(!empty($Pdata)){
                 $insert = new Audio_Transaction();
                 $insert->user_id =$user_id;
