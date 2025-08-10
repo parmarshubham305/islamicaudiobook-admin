@@ -95,9 +95,9 @@ class AudioController extends Controller
                 ];
             }
 
-            if (!empty($request->is_paid)) {
-                $rules['price'] = 'required';
-            }
+            // if (!empty($request->is_paid)) {
+            //     $rules['price'] = 'required';
+            // }
             
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
@@ -237,9 +237,9 @@ class AudioController extends Controller
                 ];
             }
 
-            if (!empty($request->is_paid)) {
-                $rules['price'] = 'required';
-            }
+            // if (!empty($request->is_paid)) {
+            //     $rules['price'] = 'required';
+            // }
 
             $validator = Validator::make($request->all(), $rules);
            

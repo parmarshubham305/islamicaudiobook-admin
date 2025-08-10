@@ -100,9 +100,9 @@ class AiaudiobookController extends Controller
                 ];
             }
 
-            if (!empty($request->is_paid)) {
-                $rules['price'] = 'required';
-            }
+            // if (!empty($request->is_paid)) {
+            //     $rules['price'] = 'required';
+            // }
 
             $validator = Validator::make($request->all(), $rules);
           
@@ -245,9 +245,9 @@ class AiaudiobookController extends Controller
                 ];
             }
 
-            if (!empty($request->is_paid)) {
-                $validation_array['price'] = 'required';
-            }
+            // if (!empty($request->is_paid)) {
+            //     $validation_array['price'] = 'required';
+            // }
 
             $validator = Validator::make($request->all(), $validation_array);
            
