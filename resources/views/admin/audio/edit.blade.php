@@ -120,6 +120,13 @@
                             </div>
 
                             <div class="col-md-4 mb-3">
+                                <div class="form-group">
+                                    <label for="priceInput">{{__('label.price')}}</label>
+                                    <input type="text" name="price" id="priceInput" value="@if($data){{$data->price}}@endif" class="form-control" placeholder="{{__('label.enter_price')}}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
                                 <div class="form-group IS Paid">
                                     <label for="download">IS Paid</label>
                                     <select class="form-control" name="is_paid" id="is_paid">
