@@ -71,7 +71,8 @@ class AiaudiobookController extends Controller
             $requestData = $request->all();
 
             if($request->isAudioTab == 1){
-                $validator = Validator::make($request->all(), [
+
+                $rules = [
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
@@ -80,9 +81,9 @@ class AiaudiobookController extends Controller
                     'audio' => 'required',   
                     'package_id' => 'nullable|array',
                     'package_id.*' => 'exists:tbl_package,id'
-                ]);
+                ];
             }else{
-                $validator = Validator::make($request->all(), [
+                $rules = [
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
@@ -96,9 +97,14 @@ class AiaudiobookController extends Controller
                     ],
                     'package_id' => 'nullable|array',
                     'package_id.*' => 'exists:tbl_package,id'
-                ]);
+                ];
             }
-            
+
+            if (!empty($request->is_paid)) {
+                $rules['price'] = 'required';
+            }
+
+            $validator = Validator::make($request->all(), $rules);
           
             if ($validator->fails()) {
                 $errs = $validator->errors()->all();
@@ -208,6 +214,7 @@ class AiaudiobookController extends Controller
         try{
             ini_set('memory_limit', '-1');
             $requestData = $request->all();
+
             if($request->isAudioTab == 0){
                 $audios = DB::select('select * from tbl_multiple_audio where audio_id = :audio_id', ['audio_id' => $id]);
                 $totalAudios = count($audios);
@@ -227,16 +234,22 @@ class AiaudiobookController extends Controller
                 }
                 $validator = Validator::make($request->all(), $validation_array);
             }else{
-                $validator = Validator::make($request->all(), [
+
+                $validation_array = [
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
                     'subcategory_id' => 'nullable|integer',
                     'description' => 'required',
                     'audio' => 'required',
-                ]);
+                ];
             }
-           
+
+            if (!empty($request->is_paid)) {
+                $validation_array['price'] = 'required';
+            }
+
+            $validator = Validator::make($request->all(), $validation_array);
            
             if ($validator->fails()) {
                 $errs = $validator->errors()->all();

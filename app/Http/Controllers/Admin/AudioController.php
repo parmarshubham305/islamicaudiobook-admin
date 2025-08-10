@@ -66,7 +66,7 @@ class AudioController extends Controller
     {
         try{
             if($request->video_type == "server_video"){
-                $validator = Validator::make($request->all(), [
+                $rules = [
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
@@ -76,9 +76,9 @@ class AudioController extends Controller
                     'package_id' => 'nullable|array',
                     'package_id.*' => 'exists:tbl_package,id'
     
-                ]);
+                ];
             } else {
-                $validator = Validator::make($request->all(), [
+                $rules = [
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
@@ -92,9 +92,14 @@ class AudioController extends Controller
                     ],
                     'package_id' => 'nullable|array',
                     'package_id.*' => 'exists:tbl_package,id'
-                ]);
+                ];
             }
-           
+
+            if (!empty($request->is_paid)) {
+                $rules['price'] = 'required';
+            }
+            
+            $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
                 $errs = $validator->errors()->all();
                 return response()->json(array('status' => 400, 'errors' => $errs));
@@ -202,8 +207,9 @@ class AudioController extends Controller
     public function update(Request $request, $id)
     {
         try{
+    
             if($request->video_type == "server_video"){
-                $validator = Validator::make($request->all(), [
+                $rules = [
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
@@ -211,9 +217,9 @@ class AudioController extends Controller
                     'description' => 'required',
                     'package_id' => 'nullable|array',
                     'package_id.*' => 'exists:tbl_package,id'
-                ]);
+                ];
             } else {
-                $validator = Validator::make($request->all(), [
+                $rules = [
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
@@ -228,8 +234,14 @@ class AudioController extends Controller
                     //     'max:10000', // Set a reasonable maximum file size (in kilobytes)
                     //     'mimes:mpga,wav,mp3',
                     // ],   
-                ]);
+                ];
             }
+
+            if (!empty($request->is_paid)) {
+                $rules['price'] = 'required';
+            }
+
+            $validator = Validator::make($request->all(), $rules);
            
             if ($validator->fails()) {
                 $errs = $validator->errors()->all();

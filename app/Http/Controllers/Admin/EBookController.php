@@ -89,7 +89,8 @@ class EBookController extends Controller
             //         'e-book' => 'required',   
             //     ]);
             // }else{
-                $validator = Validator::make($request->all(), [
+
+                $rules = [
                     'name' => 'required',
                     'artist_id' => 'required',
                     'category_id' => 'required',
@@ -103,8 +104,14 @@ class EBookController extends Controller
                     ],
                     'package_id' => 'nullable|array',
                     'package_id.*' => 'exists:tbl_package,id'
-                ]);
+                ];
             // }
+
+            if (!empty($request->is_paid)) {
+                $rules['price'] = 'required';
+            }
+
+            $validator = Validator::make($request->all(), $rules);
             
           
             if ($validator->fails()) {
@@ -294,8 +301,12 @@ class EBookController extends Controller
 
             if ($eBookData->multipleEbooks->count() <= 0 && !$request->hasFile('e-book')) {
                 $validation_array['e-book'] = ['required', 'file'];
-            }                
+            }        
             
+            if (!empty($request->is_paid)) {
+                $validation_array['price'] = 'required';
+            }
+
             $validator = Validator::make($request->all(), $validation_array);
            
             if ($validator->fails()) {
