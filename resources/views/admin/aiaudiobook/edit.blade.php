@@ -151,7 +151,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-3 mb-3" id="price_div">
                                 <div class="form-group">
                                     <label for="name">{{__('label.price')}}</label>
                                     <input type="text" name="price" value="@if($data){{$data->price}}@endif" class="form-control" placeholder="{{__('label.enter_price')}}">
@@ -582,6 +582,13 @@
             let is_paid = $("#is_paid").val();
             console.log("is_paid : ", is_paid);
 
+            if ($('[name="is_feature"]').val() == 0) {
+                $('[name="price"]').val(null);
+                $('#price_div').hide();
+            } else {
+                $('#price_div').show();
+            }
+
             if (is_paid == 0) {
                 $("#package_id").val([]);
                 $("#package_id_div").hide();
@@ -649,6 +656,17 @@
                 }
             });
             
+            $(document).on('change', '[name="is_feature"]', function () {
+                console.log("Value : ", $(this).val());
+                let is_feature = $(this).val();
+                if (is_feature == 0) {
+                    $('[name="price"]').val(null);
+                    $('#price_div').hide();
+                } else {
+                    $('#price_div').show();
+                }
+            });
+
             $('#container').on('click', '.add-another-audio', function() {
                 let audioContainer = $(this).closest('#container').find('.audio-container').first();
                 let newAudioContainer = audioContainer.clone();

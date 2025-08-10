@@ -151,7 +151,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-3 mb-3" id="price_div">
                                 <div class="form-group">
                                     <label for="name">{{__('label.price')}}</label>
                                     <input type="text" name="price" value="@if($data){{$data->price}}@endif" class="form-control" placeholder="{{__('label.enter_price')}}">
@@ -409,6 +409,13 @@
                 $("#package_id_div").show();
             }
 
+            if ($('[name="is_feature"]').val() == 0) {
+                $('[name="price"]').val(null);
+                $('#price_div').hide();
+            } else {
+                $('#price_div').show();
+            }
+
             let audioIdToDelete;
             
             $("#type").change(function() {
@@ -510,6 +517,17 @@
                         console.error("Error fetching subcategories:", xhr.responseText);
                     }
                 });
+            }
+        });
+
+        $(document).on('change', '[name="is_feature"]', function () {
+            console.log("Value : ", $(this).val());
+            let is_feature = $(this).val();
+            if (is_feature == 0) {
+                $('[name="price"]').val(null);
+                $('#price_div').hide();
+            } else {
+                $('#price_div').show();
             }
         });
 		

@@ -106,7 +106,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-4 mb-3" id="price_div">
                                 <div class="form-group">
                                     <label for="priceInput">{{__('label.price')}}</label>
                                     <input type="text" name="price" id="priceInput" class="form-control" placeholder="{{__('label.enter_price')}}">
@@ -203,6 +203,13 @@
             $("#package_id").val([]);
             $("#package_id_div").hide();
 
+            if ($('[name="is_feature"]').val() == 0) {
+                $('[name="price"]').val(null);
+                $('#price_div').hide();
+            } else {
+                $('#price_div').show();
+            }
+
             $('#thumbnail').change(function(){
                 let reader = new FileReader();
                     reader.onload = (e) => { 
@@ -276,7 +283,17 @@
                     $("#package_id_div").show();
                 }
             });
-            
+
+            $(document).on('change', '[name="is_feature"]', function () {
+                console.log("Value : ", $(this).val());
+                let is_feature = $(this).val();
+                if (is_feature == 0) {
+                    $('[name="price"]').val(null);
+                    $('#price_div').hide();
+                } else {
+                    $('#price_div').show();
+                }
+            });
         });
 		function save_video(){
 			$("#dvloader").show();
