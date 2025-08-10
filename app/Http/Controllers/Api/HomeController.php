@@ -5346,9 +5346,22 @@ class HomeController extends Controller
         }
     }
 
-    public function getSubscriptionAllModules()
+    public function getSubscriptionAllModules(Request $request)
     {
         $packages = Package::with(['audios', 'videos', 'ebooks'])->get();
+
+        $packageDataUpdated = [];
+        if (!empty($request['user_id'])) {
+            $user_id = $request['user_id'];
+
+            foreach ($packages as $package) {
+                $packageData = $package->toArray();
+                $packageData['is_buy'] = $this->common->check_is_buy($user_id, $package->id);
+                $packageDataUpdated[] = $packageData;
+            }
+
+            $packages = $packageDataUpdated;
+        }
 
         return response()->json([
             'status' => true,
