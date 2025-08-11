@@ -802,7 +802,7 @@ class RatingController extends Controller
                                 'is_purchased' => 1
                             ]
                         );
-                        if (!empty($record_purchase) || $ra->is_paid == 0) {
+                        if (!empty($record_purchase)) {
                             $ra->is_purchased = 1;
                         }else{
                             $ra->is_purchased = 0;
@@ -820,7 +820,7 @@ class RatingController extends Controller
                             ]
                         );
 
-                        if (!empty($record_purchase) || $ra->is_paid == 0) {
+                        if (!empty($record_purchase)) {
                             $ra->is_purchased = 1;
                         } else{
                             $ra->is_purchased = 0;
@@ -1000,7 +1000,7 @@ class RatingController extends Controller
                                 'is_purchased' => 1
                             ]
                         );
-                        if (!empty($record_purchase) || $ra->is_paid == 0) {
+                        if (!empty($record_purchase)) {
                             $ra->is_purchased = 1;
                         }else{
                             $ra->is_purchased = 0;
@@ -1018,7 +1018,7 @@ class RatingController extends Controller
                             ]
                         );
 
-                        if (!empty($record_purchase) || $ra->is_paid == 0) {
+                        if (!empty($record_purchase)) {
                             $ra->is_purchased = 1;
                         } else{
                             $ra->is_purchased = 0;
