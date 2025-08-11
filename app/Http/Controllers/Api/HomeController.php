@@ -2044,7 +2044,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase)) {
+                if (!empty($record_purchase) || $ra->is_paid == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -2333,7 +2333,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase)) {
+                if (!empty($record_purchase) || $ra->is_paid == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -2506,7 +2506,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase)) {
+                if (!empty($record_purchase) || $ra->is_paid == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -2730,7 +2730,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase)) {
+                if (!empty($record_purchase) || $ra->is_paid == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -2907,7 +2907,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase)) {
+                if (!empty($record_purchase) || $ra->is_paid == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -3099,8 +3099,7 @@ class HomeController extends Controller
                             'is_purchased' => 1
                         ]
                     );
-                    
-                    if (!empty($record_purchase)) {
+                    if (!empty($record_purchase) || $ra->is_paid == 0) {
                         $ra->is_purchased = 1;
                     }else{
                         $ra->is_purchased = 0;
@@ -3321,7 +3320,7 @@ class HomeController extends Controller
                             'is_purchased' => 1
                         ]
                     );
-                    if (!empty($record_purchase)) {
+                    if (!empty($record_purchase) || $ra->is_paid == 0) {
                         $ra->is_purchased = 1;
                     }else{
                         $ra->is_purchased = 0;
@@ -3555,7 +3554,7 @@ class HomeController extends Controller
                             'is_purchased' => 1
                         ]
                     );
-                    if (!empty($record_purchase)) {
+                    if (!empty($record_purchase) || $ra->is_paid == 0) {
                         $ra->is_purchased = 1;
                     }else{
                         $ra->is_purchased = 0;
@@ -3797,7 +3796,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase)) {
+                if (!empty($record_purchase) || $ra->is_paid == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -4030,7 +4029,7 @@ class HomeController extends Controller
                         ]
                     );
 
-                    if (!empty($record_purchase)) {
+                    if (!empty($record_purchase) || $ra->is_paid == 0) {
                         $ra->is_purchased = 1;
                     } else{
                         $ra->is_purchased = 0;
@@ -4561,7 +4560,7 @@ class HomeController extends Controller
                 ]
             );
 
-            if (!empty($record_purchase)) {
+            if (!empty($record_purchase) || $ra->is_paid == 0) {
                 $ra->is_purchased = 1;
             } else{
                 $ra->is_purchased = 0;
@@ -5003,7 +5002,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase)) {
+                if (!empty($record_purchase) || $ra->is_paid == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -5098,7 +5097,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase)) {
+                if (!empty($record_purchase) || $ra->is_paid == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -5178,7 +5177,7 @@ class HomeController extends Controller
                         ]
                     );
 
-                    if (!empty($record_purchase)) {
+                    if (!empty($record_purchase) || $ra->is_paid == 0) {
                         $ra->is_purchased = 1;
                     } else{
                         $ra->is_purchased = 0;
@@ -5260,7 +5259,7 @@ class HomeController extends Controller
                 ]
             );
 
-            $ra->is_purchased = !empty($record_purchase) ? 1 : 0;
+            $ra->is_purchased = (!empty($record_purchase) || $ra->is_paid == 0) ? 1 : 0;
 
             $dataarray[] = $ra;
             unset($ra->category, $ra->user, $ra->artist);
@@ -5330,7 +5329,7 @@ class HomeController extends Controller
                     ]
                 );
 
-                if (!empty($record_purchase)) {
+                if (!empty($record_purchase) || $ra->is_paid == 0) {
                     $ra->is_purchased = 1;
                 } else {
                     $ra->is_purchased = 0;
