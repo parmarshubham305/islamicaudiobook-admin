@@ -433,6 +433,9 @@ class UserController extends Controller
                 $userSubscriptionsNew = [];
 
                 foreach ($userSubscriptions as $sub) {
+                    if (empty($sub['is_buy'])) {
+                        continue;
+                    }
                     $sub_audios_old = $sub['audios'];
                     $sub_ebooks_old = $sub['ebooks'];
 
@@ -499,6 +502,9 @@ class UserController extends Controller
                 $allSubscriptionEbooks = [];
                 
                 foreach ($userSubscriptions as $subscription) {
+                    if (empty($subscription['is_buy'])) {
+                        continue;
+                    }
                     foreach ($subscription['ebooks'] as $ebook) {
                         $allSubscriptionEbooks[] = $ebook;
                     }
@@ -524,6 +530,9 @@ class UserController extends Controller
                 $allSubscriptionAudios = [];
                 
                 foreach ($userSubscriptions as $subscription) {
+                    if (empty($subscription['is_buy'])) {
+                        continue;
+                    }
                     foreach ($subscription['audios'] as $audio) {
                         $allSubscriptionAudios[] = $audio;
                     }
