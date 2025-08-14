@@ -470,7 +470,6 @@ class RatingController extends Controller
                         $Plus->save();
                     }
 
-                    $data->touch();
 
                     return $this->common->API_Response(200, __('View added successfully.') ,array($SaveData));
                 } else {
@@ -802,7 +801,7 @@ class RatingController extends Controller
                                 'is_purchased' => 1
                             ]
                         );
-                        if (!empty($record_purchase) || $ra->is_paid == 0) {
+                        if (!empty($record_purchase) || $ra->is_feature == 0) {
                             $ra->is_purchased = 1;
                         }else{
                             $ra->is_purchased = 0;
@@ -820,7 +819,7 @@ class RatingController extends Controller
                             ]
                         );
 
-                        if (!empty($record_purchase) || $ra->is_paid == 0) {
+                        if (!empty($record_purchase) || $ra->is_feature == 0) {
                             $ra->is_purchased = 1;
                         } else{
                             $ra->is_purchased = 0;
@@ -913,9 +912,9 @@ class RatingController extends Controller
                 }if($type == 'ebook'){
                     $data = EBook::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with(['category', 'artist'])->orderBy('created_at', 'desc');
                 }else if($type == 'aiaudio'){
-                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"1")->with(['category', 'artist'])->orderBy('created_at', 'desc');
+                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with(['category', 'artist'])->orderBy('created_at', 'desc');
                 }else{
-                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->where('is_aiaudiobook',"0")->with(['category', 'artist'])->orderBy('created_at', 'desc');
+                    $data = Audio::select('*','is_paid as is_purchased')->whereIn('id', $Ids)->with(['category', 'artist'])->orderBy('created_at', 'desc');
                 }
                 
 
@@ -1000,7 +999,7 @@ class RatingController extends Controller
                                 'is_purchased' => 1
                             ]
                         );
-                        if (!empty($record_purchase) || $ra->is_paid == 0) {
+                        if (!empty($record_purchase) || $ra->is_feature == 0) {
                             $ra->is_purchased = 1;
                         }else{
                             $ra->is_purchased = 0;
@@ -1018,7 +1017,7 @@ class RatingController extends Controller
                             ]
                         );
 
-                        if (!empty($record_purchase) || $ra->is_paid == 0) {
+                        if (!empty($record_purchase) || $ra->is_feature == 0) {
                             $ra->is_purchased = 1;
                         } else{
                             $ra->is_purchased = 0;

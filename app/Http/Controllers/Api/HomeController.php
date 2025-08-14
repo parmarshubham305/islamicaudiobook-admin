@@ -1675,7 +1675,7 @@ class HomeController extends Controller
             $payment_id = isset($request->payment_id) ? $request->payment_id : "";
             $currency_code = isset($request->currency_code) ? $request->currency_code : currency_code();
 
-            $Pdata = Audio::where('id',$aiAudio_id)->where('is_approved','1')->where('is_paid',"1")->first();
+            $Pdata = Audio::where('id',$aiAudio_id)->where('is_approved','1')->where('is_feature',"1")->first();
             if(!empty($Pdata)){
                 $insert = new Audio_Transaction();
                 $insert->user_id =$user_id;
@@ -2044,7 +2044,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase) || $ra->is_paid == 0) {
+                if (!empty($record_purchase) || $ra->is_feature == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -2333,7 +2333,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase) || $ra->is_paid == 0) {
+                if (!empty($record_purchase) || $ra->is_feature == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -2506,7 +2506,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase) || $ra->is_paid == 0) {
+                if (!empty($record_purchase) || $ra->is_feature == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -2730,7 +2730,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase) || $ra->is_paid == 0) {
+                if (!empty($record_purchase) || $ra->is_feature == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -2907,7 +2907,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase) || $ra->is_paid == 0) {
+                if (!empty($record_purchase) || $ra->is_feature == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -3099,7 +3099,7 @@ class HomeController extends Controller
                             'is_purchased' => 1
                         ]
                     );
-                    if (!empty($record_purchase) || $ra->is_paid == 0) {
+                    if (!empty($record_purchase) || $ra->is_feature == 0) {
                         $ra->is_purchased = 1;
                     }else{
                         $ra->is_purchased = 0;
@@ -3320,7 +3320,7 @@ class HomeController extends Controller
                             'is_purchased' => 1
                         ]
                     );
-                    if (!empty($record_purchase) || $ra->is_paid == 0) {
+                    if (!empty($record_purchase) || $ra->is_feature == 0) {
                         $ra->is_purchased = 1;
                     }else{
                         $ra->is_purchased = 0;
@@ -3554,7 +3554,7 @@ class HomeController extends Controller
                             'is_purchased' => 1
                         ]
                     );
-                    if (!empty($record_purchase) || $ra->is_paid == 0) {
+                    if (!empty($record_purchase) || $ra->is_feature == 0) {
                         $ra->is_purchased = 1;
                     }else{
                         $ra->is_purchased = 0;
@@ -3796,7 +3796,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase) || $ra->is_paid == 0) {
+                if (!empty($record_purchase) || $ra->is_feature == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -4029,7 +4029,7 @@ class HomeController extends Controller
                         ]
                     );
 
-                    if (!empty($record_purchase) || $ra->is_paid == 0) {
+                    if (!empty($record_purchase) || $ra->is_feature == 0) {
                         $ra->is_purchased = 1;
                     } else{
                         $ra->is_purchased = 0;
@@ -4560,7 +4560,7 @@ class HomeController extends Controller
                 ]
             );
 
-            if (!empty($record_purchase) || $ra->is_paid == 0) {
+            if (!empty($record_purchase) || $ra->is_feature == 0) {
                 $ra->is_purchased = 1;
             } else{
                 $ra->is_purchased = 0;
@@ -4910,7 +4910,7 @@ class HomeController extends Controller
             $payment_id = isset($request->payment_id) ? $request->payment_id : "";
             $currency_code = isset($request->currency_code) ? $request->currency_code : currency_code();
 
-            $Pdata = EBook::where('id',$ebook_id)->where('is_approved','1')->where('is_paid',"1")->first();
+            $Pdata = EBook::where('id',$ebook_id)->where('is_approved','1')->where('is_feature',"1")->first();
             if(!empty($Pdata)){
                 $insert = new EBook_Transaction();
                 $insert->user_id =$user_id;
@@ -5002,7 +5002,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase) || $ra->is_paid == 0) {
+                if (!empty($record_purchase) || $ra->is_feature == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -5097,7 +5097,7 @@ class HomeController extends Controller
                         'is_purchased' => 1
                     ]
                 );
-                if (!empty($record_purchase) || $ra->is_paid == 0) {
+                if (!empty($record_purchase) || $ra->is_feature == 0) {
                     $ra->is_purchased = 1;
                 }else{
                     $ra->is_purchased = 0;
@@ -5177,7 +5177,7 @@ class HomeController extends Controller
                         ]
                     );
 
-                    if (!empty($record_purchase) || $ra->is_paid == 0) {
+                    if (!empty($record_purchase) || $ra->is_feature == 0) {
                         $ra->is_purchased = 1;
                     } else{
                         $ra->is_purchased = 0;
@@ -5259,7 +5259,7 @@ class HomeController extends Controller
                 ]
             );
 
-            $ra->is_purchased = (!empty($record_purchase) || $ra->is_paid == 0) ? 1 : 0;
+            $ra->is_purchased = (!empty($record_purchase) || $ra->is_feature == 0) ? 1 : 0;
 
             $dataarray[] = $ra;
             unset($ra->category, $ra->user, $ra->artist);
@@ -5329,7 +5329,7 @@ class HomeController extends Controller
                     ]
                 );
 
-                if (!empty($record_purchase) || $ra->is_paid == 0) {
+                if (!empty($record_purchase) || $ra->is_feature == 0) {
                     $ra->is_purchased = 1;
                 } else {
                     $ra->is_purchased = 0;
